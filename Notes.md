@@ -1,8 +1,8 @@
-# Dialy Notes Log
+# Dialy Log
 
 ## 20th May
 
-#### MAP@3 :
+### MAP@3 :
     Understanding mean average precision MAP@3. Generally used in evaluating ranked retrieval results, in Information Retrieval.
     Helpful link: http://nlp.stanford.edu/IR-book/html/htmledition/evaluation-of-ranked-retrieval-results-1.html
     
@@ -47,3 +47,17 @@
     F is weighted harmonic mean of precision and recall, F1 is when beta = 1 and a simple harmonic mean of precision and recall
     
     beta < 1 emphasizes precision, beta > 1 emphasizes recall.
+    
+    For a single information need, Average Precision is the average of the precision value obtained for the set of top  k documents existing after each relevant document is retrieved, and this value is then averaged over information needs. Say in the example where actual = [a,b,c] and predicted = [a,d,c]
+    p1 = [a]/[a] = 1
+    p2 = 0 because, `d` is not a relevant document.
+    p3 = [a,c]/[a,d,c] = 2/3
+    map@3 = (1 + 1/2 + 2/3)/3
+
+
+### Data Notes:
+
+* x, y, accuracy, time stamp, place id
+* accuracy is how accurate x, y to the actual value
+* probably we can make use of the time of the day, some places are more likely to be checked into at a particular time of the day.
+* 
