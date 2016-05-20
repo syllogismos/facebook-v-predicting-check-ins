@@ -59,5 +59,9 @@
 
 * x, y, accuracy, time stamp, place id
 * accuracy is how accurate x, y to the actual value
-* probably we can make use of the time of the day, some places are more likely to be checked into at a particular time of the day.
-* 
+* probably we can make use of the time of the day, some places are more likely to be checked into at a particular time of the day. Restaurants are more likely to be checked in during lunch time/dinner times. Probably, classify locations based on the time of the day.
+
+### Tasks:
+* Put data into elasticsearch for giggles, and see if you can find any patterns.
+* Create sample test data for testing purposes. Create sample small data sets to evaluate code.
+* Design a python framework to automate tasks such as building a model, create a submission, logging, evaluating on our test data.
