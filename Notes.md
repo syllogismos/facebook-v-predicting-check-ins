@@ -28,7 +28,7 @@
         Accuracy = [a,c] + [e]/[a,b,c,d,e] = 3/5
         
     * As we make more and more predictions, if there are no new true positives, the recall stays constant, but precision drops.
-    * Recall means out of all the positives, how many did we predict correctly.
+    * Recall means out of all the positives, how many did we positives did we get.
     * Precision means out of all our predictions, how many did we get it right.
     * Recall is 1 if we return everything as a prediction. But the precicion drops significantly.
     * The reason why accuracy isn't a good measure is cause when the data is highly skewed, it makes no sense. Say for example only 0.01% of values will be true. You can just predict everything to be false still end up with 99.99 accuracy.
@@ -48,11 +48,11 @@
     
     beta < 1 emphasizes precision, beta > 1 emphasizes recall.
     
-    For a single information need, Average Precision is the average of the precision value obtained for the set of top  k documents existing after each relevant document is retrieved, and this value is then averaged over information needs. Say in the example where actual = [a,b,c] and predicted = [a,d,c]
+    For a single information need, Average Precision is the average of the precision value obtained for the set of top  k documents existing **after each relevant document is retrieved**, and this value is then averaged over information needs. Say in the example where actual = [a,b,c] and predicted = [a,d,c]
     p1 = [a]/[a] = 1
     p2 = 0 because, `d` is not a relevant document.
     p3 = [a,c]/[a,d,c] = 2/3
-    map@3 = (1 + 1/2 + 2/3)/3
+    map@3 = (1 + 0 + 2/3)/3
 
 
 ### Data Notes:
