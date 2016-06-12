@@ -113,13 +113,6 @@ def compute_place_wise_stats(file_name, output_file_name):
     return
 
 
-def build_mean_xy_matrix():
-    file_names = map(lambda x: '../split_train/' + str(x) + '_place', range(1,23))
-    load_data = lambda file_name: np.loadtxt(file_name, dtype = 'float', delimiter=',', skiprows=1, usecols=(0, 2, 3))
-    sub_matrices = map(load_data, file_names)
-    mean_matrix = np.vstack(sub_matrices)
-    del(sub_matrices)
-    return mean_matrix
 
 # dumb model is a sample model that returns three given place ids,
 # no matter what the test data point is
@@ -127,7 +120,7 @@ def dumb_model(x):
     print "inside dumb model", x
     return ['8523065625', '1757726713', '1137537235']
 
-class Model:
+class BaseModel(object):
     cross_validation_file = '../cross_validation_02.csv'
     test_file = '../test.csv'
     cv_mean_precision = 0.0
@@ -141,6 +134,12 @@ class Model:
         get_place_id :: [x, y, accuracy, time] -> [place1, place2, place3]
         """
         return ['8523065625', '1757726713', '1137537235']
+
+    def test_get_place_id(self):
+        row = ['0.1675', '1.3608', '107', '930883']
+        print "row is => ", row
+        place_ids = self.get_place_id(row)
+        print "Place ids are ", place_ids
 
     def train_model(self):
         pass
