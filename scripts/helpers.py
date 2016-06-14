@@ -4,6 +4,7 @@ import datetime
 import numpy as np
 import random
 from tqdm import tqdm
+from scipy import stats
 
 start_date = datetime.datetime(2016, 5, 1)
 
@@ -112,7 +113,39 @@ def compute_place_wise_stats(file_name, output_file_name):
         header = 'place_id, count, x_mean, y_mean, a_mean, x_median, y_median, a_median, x_std, y_std, a_std, x_var, y_var, a_var')
     return
 
+def compute_mode_xy(file_name, output_file_name):
+    """
+    compute mode of x, y on a sorted train chunk.
+    also for x and y make the round down the values by one decimal point,
+    for example, x = 2.3456 => x ~ 2.345, same for y
+    """
+    data = load_data(file_name)
+    sorted_data = data[data[:, 4].argsort()]
+    place_ids = np.unique(data[:, 4])
+    place_wise_data = np.zeros((len(place_ids), 5))
+    print "Iterating through each place and computing mode"
+    for i, place_id in tqdm(enumerate(place_ids)):
+        temp_data_set = sorted_data[sorted_data[:, 4] == place_id]
+        xarr = temp_data_set[:, 0]
+        yarr = temp_data_set[:, 1]
+        xarr = xarr.astype('float')
+        yarr = yarr.astype('float')
+        xarrr = np.around(xarr, 3)
+        yarrr = np.around(yarr, 3)
+        x_mode = stats.mode(xarrr)[0][0]
+        y_mode = stats.mode(yarrr)[0][0]
+        xarrr = np.around(xarr, 2)
+        yarrr = np.around(yarr, 2)
+        x_mode_2 = stats.mode(xarrr)[0][0]
+        y_mode_2 = stats.mode(yarrr)[0][0]
+        mode_stats = np.array([place_id, x_mode, y_mode, x_mode_2, y_mode_2])
+        place_wise_data[i] = mode_stats
 
+    print "Saving File"
+    np.savetxt(output_file_name, place_wise_data, delimiter = ',',\
+        fmt = ['%.0f', '%.3f', '%.3f', '%.2f', '%.2f'],\
+        header = 'place_id, x_mode_3, y_mode_3, x_mode_2, y_mode_2')
+    return
 
 # dumb model is a sample model that returns three given place ids,
 # no matter what the test data point is
