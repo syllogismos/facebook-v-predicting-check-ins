@@ -266,6 +266,7 @@ class BaseModel(object):
                     print "computing cv precision for %s row" %(n)
             except Exception, e:
                 print "Exception in get_cross_validation_error func"
+                print row
                 print e
                 break
         cv_mean_precision = total_avg_precision/n
