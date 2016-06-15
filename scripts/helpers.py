@@ -67,6 +67,53 @@ def sample_file(input_file, output_file, cutoff):
     o.close()
     f.close()
 
+def generate_cv_and_training_data_sets(input_file, cv_file, train_file,\
+    cutoff = 0.02, cv_count_cutoff = 5):
+    """
+    generate cross validation and training data set.
+    input_file: initial training_file
+    cv_file: output cross_validation file
+    train_file: output_training file
+    cutoff: random.random < cutoff => datapoint goes to cv set
+    cv_count_cutoff: only if that place has more count than the cutoff it goes to cv set
+    """
+
+    # build the place_id matrix
+    file_names = map(lambda x: '../split_train/' + str(x) + '_place', range(1, 23))
+    use_cols = (0, 1)
+    load_data = lambda file_name: np.loadtxt(file_name, dtype = 'float', delimiter = ',',\
+        skiprows = 1, usecols = use_cols)
+    sub_matrices = map(load_data, file_names)
+    count_matrix = np.vstack(sub_matrices)
+    del(sub_matrices)
+    f = open(input_file, 'rb')
+    fcsv = csv.reader(f)
+    suffix = '_' + str(cutoff) + '_' + str(cv_count_cutoff) + '.csv'
+    c = open(cv_file + suffix, 'wb')
+    t = open(train_file + suffix, 'wb')
+
+    while True:
+        try:
+            a = fcsv.next()
+            r = random.random()
+            place_count = count_matrix[count_matrix[:, 0] == int(a[-1])] # This is soo dumb\
+                # create a set object of counts of all places
+            if len(place_count) > 0:
+                count = place_count[0][1]
+            else:
+                count = 0
+            if (random.random() < cutoff) and (count > cv_count_cutoff):
+                c.write(','.join(a) + '\n')
+            else:
+                t.write(','.join(a) + '\n')
+        except Exception, e:
+            print e
+            break
+    f.close()
+    c.close()
+    t.close()
+
+
 def load_data(file_name):
     f = open(file_name, 'rb')
     fcsv = csv.reader(f)
