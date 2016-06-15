@@ -95,7 +95,7 @@ def generate_grid_wise_cardinality_and_training_files(train_file, X, Y, xd, yd, 
         for t in range(n + 1)]\
         for s in range(m + 1)]
     cardinality_pickle = folder_name + 'cardinality_pickle.pkl'
-    status = folder_name + 'status'
+    status = folder_name + 'status.pkl'
     f = file(train_file, 'rb')
     fcsv = csv.reader(f)
     progress = 0
@@ -145,7 +145,7 @@ class top_3_grid_places_model(BaseModel):
         # load cardinality matrix and generate files if the run is not done for above X,Y
         # values
         folder_name = '../' + '_'.join([pref, str(X), str(Y), str(xd), str(yd)]) + '/'
-        status = folder_name + 'status'
+        status = folder_name + 'status.pkl'
         if not os.path.exists(status):
             print "Generating grid wise files"
             generate_grid_wise_cardinality_and_training_files('../main_train_0.02_5.csv', \

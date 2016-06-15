@@ -3,4 +3,5 @@
 *.txt
 .ipynb_checkpoints/*
 *.pyc
+*.pkl
 split_train/
