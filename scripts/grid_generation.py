@@ -91,9 +91,9 @@ def generate_grid_wise_cardinality_and_training_files(train_file, X, Y, xd, yd, 
     folder_name = '../' + '_'.join([pref, str(X), str(Y), str(xd), str(yd)]) + '/'
     if not os.path.exists(folder_name):
         os.makedirs(folder_name)
-    file_handles = [[open(folder_name + 'grid_data' + suffix(s, t), 'wb')\
-        for t in range(n + 1)]\
-        for s in range(m + 1)]
+    # file_handles = [[open(folder_name + 'grid_data' + suffix(s, t), 'wb')\
+    #     for t in range(n + 1)]\
+    #     for s in range(m + 1)]
     cardinality_pickle = folder_name + 'cardinality_pickle.pkl'
     status = folder_name + 'status.pkl'
     f = file(train_file, 'rb')
@@ -107,7 +107,7 @@ def generate_grid_wise_cardinality_and_training_files(train_file, X, Y, xd, yd, 
             place_id = int(a[-1])
             grids = get_grids(c, X, Y, xd, yd, train = True)
             for grid in grids:
-                file_handles[grid[0]][grid[1]].write(line)
+                # file_handles[grid[0]][grid[1]].write(line)
                 increment(cardinality[grid[0]][grid[1]], place_id)
             progress += 1
             if progress % 1000000 == 0:
@@ -116,7 +116,7 @@ def generate_grid_wise_cardinality_and_training_files(train_file, X, Y, xd, yd, 
             print e
             print a
             break
-    temp = [map(lambda file_handle: file_handle.close(), row) for row in file_handles]
+    # temp = [map(lambda file_handle: file_handle.close(), row) for row in file_handles]
     pickle.dump(cardinality, open(cardinality_pickle, 'wb'))
     pickle.dump(True, open(status, 'wb'))
     pass
