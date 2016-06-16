@@ -215,6 +215,12 @@ class BaseModel(object):
         """
         return ['8523065625', '1757726713', '1137537235']
 
+    def get_place_ids(self, rows):
+        """
+        vectorized form for get_place_id
+        """
+        pass
+
     def test_get_place_id(self):
         row = ['0.1675', '1.3608', '107', '930883']
         print "row is => ", row
