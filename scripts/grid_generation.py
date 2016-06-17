@@ -141,6 +141,12 @@ class top_3_grid_places_model(BaseModel):
         self.xd = xd
         self.yd = yd
         self.pref = pref
+        self.description = 'top_3_grid_places_model_' + str(X) + '_' + \
+            str(Y) + '_' + \
+            str(xd) + '_' + \
+            str(yd) + '_'
+        print "@@@@@@@@@@@@@@@@@@@"
+        print self.description
 
         # load cardinality matrix and generate files if the run is not done for above X,Y
         # values
@@ -158,3 +164,22 @@ class top_3_grid_places_model(BaseModel):
         c = (float(row[0]), float(row[1]))
         m, n = get_grids(c, self.X, self.Y, self.xd, self.yd)[0]
         return map(str, self.M[m][n])
+
+if __name__ == '__main__':
+    f = open('../cv_results_run_5.txt', 'ab')
+    # Xs = range(10, 30, 4)
+    # Ys = range(10, 30, 4)
+    # xd = 4
+    # yd = 1
+    # for X in Xs:
+    #     for Y in Ys:
+    #         if X > Y:
+    #             model = top_3_grid_places_model(X = X, Y = Y, xd = xd, yd = yd)
+    #             cv = model.get_cross_validation_mean_precision()
+    #             line = model.description + ':::' + str(cv) + '\n'
+    #             f.write(line)
+    model = top_3_grid_places_model(X = 10, Y = 5, xd = 4, yd = 1)
+    cv = model.get_cross_validation_mean_precision()
+    line = model.description + ':::' + str(cv) + '\n'
+    f.write(line)
+    f.close()

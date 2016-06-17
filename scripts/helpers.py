@@ -205,9 +205,11 @@ class BaseModel(object):
     test_file = '../test.csv'
     cv_mean_precision = 0.0
 
-    def __init__(self, cross_validation_file = '../cross_validation_02.csv', test_file = '../test.csv'):
+    def __init__(self, cross_validation_file = '../cross_validation_02.csv', \
+        test_file = '../test.csv', description = 'test run'):
         self.cross_validation_file = cross_validation_file
         self.test_file = test_file
+        self.description = description
 
     def get_place_id(self, row):
         """
