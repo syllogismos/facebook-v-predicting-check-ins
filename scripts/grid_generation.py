@@ -85,15 +85,17 @@ def increment(s, key):
 def suffix(m, n):
     return '_' + str(m) + '_' + str(n) + '.csv'
 
-def generate_grid_wise_cardinality_and_training_files(train_file, X, Y, xd, yd, pref= 'test'):
+def generate_grid_wise_cardinality_and_training_files(train_file, X, Y, xd, yd,\
+    pref= 'test', files = False):
     m, n = get_grids((10.0000, 10.0000), X, Y, xd, yd)[0]
     cardinality = [[{} for t in range(n + 1)] for s in range(m + 1)]
     folder_name = '../' + '_'.join([pref, str(X), str(Y), str(xd), str(yd)]) + '/'
     if not os.path.exists(folder_name):
         os.makedirs(folder_name)
-    # file_handles = [[open(folder_name + 'grid_data' + suffix(s, t), 'wb')\
-    #     for t in range(n + 1)]\
-    #     for s in range(m + 1)]
+    if files:
+        file_handles = [[open(folder_name + 'grid_data' + suffix(s, t), 'wb')\
+            for t in range(n + 1)]\
+            for s in range(m + 1)]
     cardinality_pickle = folder_name + 'cardinality_pickle.pkl'
     status = folder_name + 'status.pkl'
     f = file(train_file, 'rb')
@@ -107,7 +109,8 @@ def generate_grid_wise_cardinality_and_training_files(train_file, X, Y, xd, yd, 
             place_id = int(a[-1])
             grids = get_grids(c, X, Y, xd, yd, train = True)
             for grid in grids:
-                # file_handles[grid[0]][grid[1]].write(line)
+                if files:
+                    file_handles[grid[0]][grid[1]].write(line)
                 increment(cardinality[grid[0]][grid[1]], place_id)
             progress += 1
             if progress % 1000000 == 0:
@@ -116,10 +119,10 @@ def generate_grid_wise_cardinality_and_training_files(train_file, X, Y, xd, yd, 
             print e
             print a
             break
-    # temp = [map(lambda file_handle: file_handle.close(), row) for row in file_handles]
+    if files:
+        temp = [map(lambda file_handle: file_handle.close(), row) for row in file_handles]
     pickle.dump(cardinality, open(cardinality_pickle, 'wb'))
     pickle.dump(True, open(status, 'wb'))
-    pass
 
 def get_top_3_places_of_dict(cardinality_dict):
     """
@@ -164,6 +167,39 @@ class top_3_grid_places_model(BaseModel):
         c = (float(row[0]), float(row[1]))
         m, n = get_grids(c, self.X, self.Y, self.xd, self.yd)[0]
         return map(str, self.M[m][n])
+
+class Grid(object):
+    def __init__(self, X = 800, Y = 400, dx = 200, dy = 100,\
+        pref = 'grid', files_flag = False):
+        self.X = X
+        self.Y = Y
+        self.dx = dx
+        self.dy = dy
+        self.pref = pref
+        self.files_flag = files_flag
+        self.max_m, self.max_n = get_grids((10.0000, 10.0000), X, Y, xd, yd)[0]
+
+    def getFolder(self):
+        return '../' + '_'.join([pref, str(X), str(Y), str(xd), str(yd)]) + '/'
+
+    def getGirdFiles(self):
+        c = itertools.product(range(self.max_m + 1), range(self.max_ni + 1))
+        grid_files = map(lambda x: self.getFolder() + '_'.join(['grid_data', x[0], x[1]])\
+            + '.csv', c)
+        return list(grid_files)
+
+    def getGridFile(self, m, n):
+        return self.getFolder() + '_'.join(['grid_data', m, n]) + '.csv'
+
+    def generateCardinalityMatrix(self):
+        folder_name = self.getFolder()
+        status = folder_name + 'status.pkl'
+        cardinality = folder_name + 'cardinality_pickle.pkl'
+        if not os.path.exists(status):
+            print "Generating grid cardinality matrix of grid"
+            generate_grid_wise_cardinality_and_training_files('../main_train_0.02_5.csv', ,\
+                self.X, self.Y, self.xd, self.yd, self.pref, self.files_flag)
+        self.M = pickle.load(open(cardinality, 'rb'))
 
 if __name__ == '__main__':
     f = open('../cv_results_run_5.txt', 'ab')
