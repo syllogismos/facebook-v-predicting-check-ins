@@ -8,6 +8,9 @@ from scipy import stats
 
 start_date = datetime.datetime(2016, 5, 1)
 
+days = lambda t: (int(t) % (86400*7))/ 86400
+hours = lambda t: (int(t) % 86400) / 3600
+
 def apk(actual, predicted, k=3):
     """
     Computes the average precision at k.
