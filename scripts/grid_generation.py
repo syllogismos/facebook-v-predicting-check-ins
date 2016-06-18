@@ -169,27 +169,27 @@ class top_3_grid_places_model(BaseModel):
         return map(str, self.M[m][n])
 
 class Grid(object):
-    def __init__(self, X = 800, Y = 400, dx = 200, dy = 100,\
+    def __init__(self, X = 800, Y = 400, xd = 200, yd = 100,\
         pref = 'grid', files_flag = False):
         self.X = X
         self.Y = Y
-        self.dx = dx
-        self.dy = dy
+        self.xd = xd
+        self.yd = yd
         self.pref = pref
         self.files_flag = files_flag
         self.max_m, self.max_n = get_grids((10.0000, 10.0000), X, Y, xd, yd)[0]
 
     def getFolder(self):
-        return '../' + '_'.join([pref, str(X), str(Y), str(xd), str(yd)]) + '/'
+        return '../' + '_'.join([self.pref, str(self.X), str(self.Y), str(self.xd), str(self.yd)]) + '/'
 
     def getGirdFiles(self):
         c = itertools.product(range(self.max_m + 1), range(self.max_ni + 1))
-        grid_files = map(lambda x: self.getFolder() + '_'.join(['grid_data', x[0], x[1]])\
+        grid_files = map(lambda x: self.getFolder() + '_'.join(['grid_data', str(x[0]), str(x[1])])\
             + '.csv', c)
         return list(grid_files)
 
     def getGridFile(self, m, n):
-        return self.getFolder() + '_'.join(['grid_data', m, n]) + '.csv'
+        return self.getFolder() + '_'.join(['grid_data', str(m), str(n)]) + '.csv'
 
     def generateCardinalityMatrix(self):
         folder_name = self.getFolder()
@@ -197,7 +197,7 @@ class Grid(object):
         cardinality = folder_name + 'cardinality_pickle.pkl'
         if not os.path.exists(status):
             print "Generating grid cardinality matrix of grid"
-            generate_grid_wise_cardinality_and_training_files('../main_train_0.02_5.csv', ,\
+            generate_grid_wise_cardinality_and_training_files('../main_train_0.02_5.csv',\
                 self.X, self.Y, self.xd, self.yd, self.pref, self.files_flag)
         self.M = pickle.load(open(cardinality, 'rb'))
 
