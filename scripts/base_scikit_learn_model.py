@@ -70,14 +70,19 @@ class SklearnModel(BaseModel):
         trained_model_file = self.grid.getFolder() + self.description + '_' +\
             'grid_model_pickle.pkl'
 
-        if (not os.path.exists(trained_model_file)) or force:
-            for m in range(self.grid.max_m + 1):
-                for n in range(self.grid.max_n + 1):
-                    # train each grid seperately
-                    self.train_grid(m, n)
-            pickle.dump(self.model, open(trained_model_file, 'wb'))
-        else:
-            self.model = pickle.load(open(trained_model_file), 'rb')
+        # if (not os.path.exists(trained_model_file)) or force:
+        #     for m in range(self.grid.max_m + 1):
+        #         for n in range(self.grid.max_n + 1):
+        #             # train each grid seperately
+        #             self.train_grid(m, n)
+        #     pickle.dump(self.model, open(trained_model_file, 'wb'))
+        # else:
+        #     self.model = pickle.load(open(trained_model_file), 'rb')
+
+        for m in range(self.grid.max_m + 1):
+            for n in range(self.grid.max_n + 1):
+                # train each grid seperately
+                self.train_grid(m, n)
 
     def train_grid(self, m, n):
         """
@@ -85,7 +90,11 @@ class SklearnModel(BaseModel):
         print "Training %s, %s grid" %(m, n)
         init_time = time.time()
         data = np.loadtxt(self.grid.getGridFile(m, n), dtype = float, delimiter = ',')
-        mask = np.array(map(lambda x: self.grid.M[m][n][x] > 20, data[:, 5]))
+        if len(data) == 0:
+            # if the grid contains barely zero data, make model None
+            self.model[m][n]['model'] = None
+            return
+        mask = np.array(map(lambda x: self.grid.M[m][n][x] > self.threshold, data[:, 5]))
         masked_data = data[mask, :]
         X, x_transformer = self.transform_x(masked_data[:, (1, 2, 3, 4)])
         Y, y_transformer = self.transform_y(masked_data[:, 5])
@@ -94,10 +103,15 @@ class SklearnModel(BaseModel):
         self.model[m][n]['y_transformer'] = y_transformer
 
         if len(Y) == 0:
+            # if masked data is of length zero then also make model None
             self.model[m][n]['model'] = None
         else:
-            self.model[m][n]['model'] = KNeighborsClassifier(n_neighbors = 29,\
-                weights = 'distance', metric = 'manhattan')
+            if self.grid.pref == 'test':
+                self.model[m][n]['model'] = KNeighborsClassifier(n_neighbors = 2,\
+                    weights = 'distance', metric = 'manhattan')
+            else:
+                self.model[m][n]['model'] = KNeighborsClassifier(n_neighbors = 29,\
+                    weights = 'distance', metric = 'manhattan')
             self.model[m][n]['model'].fit(X, np.ravel(Y))
 
         print "Time taken to train grid %s, %s is: %s" %(m, n, time.time() - init_time)
@@ -140,6 +154,13 @@ class SklearnModel(BaseModel):
         else:
             prediction_probs = self.model[m][n]['model'].predict_proba(temp_x)
             top_3_placeids = self.model[m][n]['y_transformer']['label_encoder'].inverse_transform(np.argsort(prediction_probs, axis=1)[:,::-1][:,:3])
+
+            # temporary hack when the no of predictions for a row is less than 3
+            x, y = top_3_placeids.shape
+            if y < 3:
+                temp_array = np.array([[5348440074]*(3-y)]*len(top_3_placeids))
+                top_3_placeids = np.hstack((top_3_placeids, temp_array))
+
         return np.hstack((grid_data[:, 0].reshape(-1, 1), top_3_placeids))
 
     def generate_submission_file(self, submission_file):
@@ -151,7 +172,7 @@ class SklearnModel(BaseModel):
         for i in range(len(predictions)):
             row = predictions[i]
             row_id = row[0]
-            row_prediction_string = ' '.join(row_prediction[1:])
+            row_prediction_string = ' '.join(row[1:])
             submission.write(row_id + ',' + row_prediction_string + '\n')
             if i % 1000000 == 0:
                 print "Generating %s row of test data" %(i)
