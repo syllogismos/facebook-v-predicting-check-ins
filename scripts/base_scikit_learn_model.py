@@ -132,7 +132,7 @@ class SklearnModel(BaseModel):
         grid_data is test/cv data from that particular grid
         return row_id, and top 3 predictions
         """
-        print "Print grid %s, %s" %(m, n)
+        print "predicting grid %s, %s" %(m, n)
         grid_data = np.array(grid_data)
         temp_x = self.transform_x(grid_data[:, (1, 2, 3, 4)])[0]
         if self.model[m][n]['model'] == None:
