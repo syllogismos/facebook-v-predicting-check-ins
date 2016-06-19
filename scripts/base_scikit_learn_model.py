@@ -26,7 +26,7 @@ class SklearnModel(BaseModel):
 
     def __init__(self, cross_validation_file = '../main_cv_0.02_5.csv',\
         test_file = '../test.csv', grid = base_grid, threshold = 20,\
-        description = 'test sklearn'):
+        description = 'test_sklearn_model'):
         self.cross_validation_file = cross_validation_file
         self.test_file = test_file
         self.description = description
@@ -60,15 +60,24 @@ class SklearnModel(BaseModel):
         new_y = y_transformer['label_encoder'].transform(y).reshape(-1, 1)
         return (new_y, y_transformer)
 
-    def train(self):
+    def train(self, force = False):
         """
         training each grid seperately and storing building the self.model parameter
         the dictionary model[m][n] contains details about the grid(m, n)
+
+        using force flag we can recompute the model even if pickle exists from earlier train run
         """
-        for m in range(self.grid.max_m + 1):
-            for n in range(self.grid.max_n + 1):
-                # train each grid seperately
-                self.train_grid(m, n)
+        trained_model_file = self.grid.getFolder() + self.description + '_' +\
+            'grid_model_pickle.pkl'
+
+        if (not os.path.exists(trained_model_file)) or force:
+            for m in range(self.grid.max_m + 1):
+                for n in range(self.grid.max_n + 1):
+                    # train each grid seperately
+                    self.train_grid(m, n)
+            pickle.dump(self.model, open(trained_model_file, 'wb'))
+        else:
+            self.model = pickle.load(open(trained_model_file), 'rb')
 
     def train_grid(self, m, n):
         """
@@ -84,9 +93,12 @@ class SklearnModel(BaseModel):
         self.model[m][n]['x_transformer'] = x_transformer
         self.model[m][n]['y_transformer'] = y_transformer
 
-        self.model[m][n]['model'] = KNeighborsClassifier(n_neighbors = 29,\
-            weights = 'distance', metric = 'manhattan')
-        self.model[m][n]['model'].fit(X, Y)
+        if len(Y) == 0:
+            self.model[m][n]['model'] = None
+        else:
+            self.model[m][n]['model'] = KNeighborsClassifier(n_neighbors = 29,\
+                weights = 'distance', metric = 'manhattan')
+            self.model[m][n]['model'].fit(X, np.ravel(Y))
 
         print "Time taken to train grid %s, %s is: %s" %(m, n, time.time() - init_time)
         print "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
@@ -100,6 +112,7 @@ class SklearnModel(BaseModel):
         """
         grid_wise_data = [[[] for n in range(self.grid.max_n + 1)]\
             for m in range(self.grid.max_m + 1)]
+        print "Computing grid_wise_data from test_data"
         for i in range(len(test_data)):
             m, n = get_grids_of_a_point((test_data[i][1], test_data[i][2]), self.grid)[0]
             grid_wise_data[m][n].append(test_data[i])
@@ -107,9 +120,10 @@ class SklearnModel(BaseModel):
         predictions = []
         for m in range(self.grid.max_m + 1):
             for n in range(self.grid.max_n + 1):
-                predictions.append(self.predict_grid(grid_wise_data[m][n], m, n))
+                if len(grid_wise_data[m][n]) > 0:
+                    predictions.append(self.predict_grid(np.array(grid_wise_data[m][n]), m, n))
 
-        predictions = np.vstack(tuple(predictions))
+        predictions = np.vstack(tuple(predictions)).astype(int)
         sorted_row_predictions = predictions[predictions[:, 0].argsort()]
         return sorted_row_predictions
 
@@ -118,10 +132,14 @@ class SklearnModel(BaseModel):
         grid_data is test/cv data from that particular grid
         return row_id, and top 3 predictions
         """
+        print "Print grid %s, %s" %(m, n)
         grid_data = np.array(grid_data)
         temp_x = self.transform_x(grid_data[:, (1, 2, 3, 4)])[0]
-        prediction_probs = self.model[m][n]['model'].predict_proba(temp_x)
-        top_3_placeids = self.model[m][n]['y_transformer']['label_encoder'].inverse_transform(np.argsort(prediction_probs, axis=1)[:,::-1][:,:3])
+        if self.model[m][n]['model'] == None:
+            top_3_placeids = np.array([[5348440074, 9988088517, 4048573921]]*len(temp_x))
+        else:
+            prediction_probs = self.model[m][n]['model'].predict_proba(temp_x)
+            top_3_placeids = self.model[m][n]['y_transformer']['label_encoder'].inverse_transform(np.argsort(prediction_probs, axis=1)[:,::-1][:,:3])
         return np.hstack((grid_data[:, 0].reshape(-1, 1), top_3_placeids))
 
     def generate_submission_file(self, submission_file):
@@ -144,6 +162,6 @@ class SklearnModel(BaseModel):
         predictions = self.predict(data)
         predictions = predictions.astype(int)
         actual = data[:, -1].astype(int).reshape(-1, 1)
-        preds = np.hstack(predictions, actual)
+        preds = np.hstack((predictions, actual))
         apk_list = map(lambda row: apk(row[-1:], row[1: -1]), preds)
         self.cv_mean_precision = np.mean(apk_list)
