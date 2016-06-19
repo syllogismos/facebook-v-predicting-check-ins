@@ -23,10 +23,30 @@ def get_grids_of_a_point(c, grid, buff = False):
     return get_grids(c, grid.X, grid.Y, grid.xd, grid.yd, train = buff)
 
 class SklearnModel(BaseModel):
+    """
+    Base Class to run scikit learn classifiers.
+    You will have to over rider functions
+        transform_x
+        transform_y
+        custom_classifier
+
+        and rarely predict_grid
+
+    ex:
+    from grid_generation import Grid
+    grid = Grid(X = 800, Y = 400, xd = 200, yd = 100, pref = 'test', files_flag = True)
+    sk_model = SklearnModel(grid = grid, threshold = 20, description = "example sklearn run"\
+        test_file = 'test_file.csv', cross_validation_file = 'cv_file.csv')
+    """
 
     def __init__(self, cross_validation_file = '../main_cv_0.02_5.csv',\
         test_file = '../test.csv', grid = base_grid, threshold = 20,\
         description = 'test_sklearn_model'):
+        """
+        grid = grid_generation.Grid()
+        threshold = if a place has a cardinality below threshold, we ignore from training data
+        description = model description
+        """
         self.cross_validation_file = cross_validation_file
         self.test_file = test_file
         self.description = description
