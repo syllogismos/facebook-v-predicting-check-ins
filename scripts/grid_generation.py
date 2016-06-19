@@ -170,13 +170,26 @@ class top_3_grid_places_model(BaseModel):
 
 class Grid(object):
     def __init__(self, X = 800, Y = 400, xd = 200, yd = 100,\
-        pref = 'grid', files_flag = False):
+        pref = 'test', files_flag = False):
+        """
+        X, Y, xd, yd :: grid definitions
+        pref: prefix with which the folder that contains the cardinality matrix
+            and etc stays
+            if pref == test, it considers the test file '../code_train.csv'
+            else it considers the train file '../main_train_0.02_5.csv'
+        files_flag: specifies if individual grid files are to be generated along with
+            the cardinality matrix
+        """
         self.X = X
         self.Y = Y
         self.xd = xd
         self.yd = yd
         self.pref = pref
         self.files_flag = files_flag
+        if self.pref == 'test':
+            self.train_file = '../code_train.csv'
+        else:
+            self.train_file = '../main_train_0.02_5.csv'
         self.max_m, self.max_n = get_grids((10.0000, 10.0000), X, Y, xd, yd)[0]
 
     def getFolder(self):
@@ -197,7 +210,7 @@ class Grid(object):
         cardinality = folder_name + 'cardinality_pickle.pkl'
         if not os.path.exists(status):
             print "Generating grid cardinality matrix of grid"
-            generate_grid_wise_cardinality_and_training_files('../main_train_0.02_5.csv',\
+            generate_grid_wise_cardinality_and_training_files(self.train_file,\
                 self.X, self.Y, self.xd, self.yd, self.pref, self.files_flag)
         self.M = pickle.load(open(cardinality, 'rb'))
 
