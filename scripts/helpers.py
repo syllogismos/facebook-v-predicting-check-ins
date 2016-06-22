@@ -10,6 +10,7 @@ start_date = datetime.datetime(2016, 5, 1)
 
 days = lambda t: (int(t) % (86400*7))/ 86400
 hours = lambda t: (int(t) % 86400) / 3600
+quarter_days = lambda t: (int(t) % 86400) / (3600 * 4)
 
 def apk(actual, predicted, k=3):
     """
@@ -87,7 +88,8 @@ def generate_cv_and_training_data_sets(input_file, cv_file, train_file,\
     load_data = lambda file_name: np.loadtxt(file_name, dtype = 'float', delimiter = ',',\
         skiprows = 1, usecols = use_cols)
     sub_matrices = map(load_data, file_names)
-    count_matrix = np.vstack(sub_matrices)
+    count_matrix = np.vstack(sub_matrices).astype(int)
+    count_dict = dict(count_matrix)
     del(sub_matrices)
     f = open(input_file, 'rb')
     fcsv = csv.reader(f)
@@ -99,13 +101,12 @@ def generate_cv_and_training_data_sets(input_file, cv_file, train_file,\
         try:
             a = fcsv.next()
             r = random.random()
-            place_count = count_matrix[count_matrix[:, 0] == int(a[-1])] # This is soo dumb\
-                # create a set object of counts of all places
-            if len(place_count) > 0:
-                count = place_count[0][1]
-            else:
-                count = 0
-            if (random.random() < cutoff) and (count > cv_count_cutoff):
+            place_count = count_dict[int(a[-1])]
+            # if len(place_count) > 0:
+            #     count = place_count[0][1]
+            # else:
+            #     count = 0
+            if (random.random() < cutoff) and (place_count > cv_count_cutoff):
                 c.write(','.join(a) + '\n')
             else:
                 t.write(','.join(a) + '\n')
