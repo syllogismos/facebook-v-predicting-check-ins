@@ -4,4 +4,5 @@
 .ipynb_checkpoints/*
 *.pyc
 *.pkl
+ec2*
 split_train/
