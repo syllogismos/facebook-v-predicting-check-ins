@@ -92,7 +92,6 @@ def generate_cv_and_training_data_sets(input_file, cv_file, train_file,\
     cards = np.loadtxt('../place_ids_cardinality.txt', dtype = int)
     cards_trans = map(lambda x: (x[1], x[0]), cards)
     count_dict = dict(cards_trans)
-    del(sub_matrices)
     f = open(input_file, 'rb')
     fcsv = csv.reader(f)
     suffix = '_' + str(cutoff) + '_' + str(cv_count_cutoff) + '.csv'
