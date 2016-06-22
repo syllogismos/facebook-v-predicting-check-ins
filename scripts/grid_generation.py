@@ -170,7 +170,7 @@ class top_3_grid_places_model(BaseModel):
 
 class Grid(object):
     def __init__(self, X = 800, Y = 400, xd = 200, yd = 100,\
-        pref = 'test', files_flag = False):
+        pref = 'test', files_flag = False, train_file = '../main_train_0.02_5.csv'):
         """
         X, Y, xd, yd :: grid definitions
         pref: prefix with which the folder that contains the cardinality matrix
@@ -186,10 +186,11 @@ class Grid(object):
         self.yd = yd
         self.pref = pref
         self.files_flag = files_flag
+        self.train_file = train_file
         if self.pref == 'test':
             self.train_file = '../code_train.csv'
         else:
-            self.train_file = '../main_train_0.02_5.csv'
+            self.train_file = self.train_file
         self.max_m, self.max_n = get_grids((10.0000, 10.0000), X, Y, xd, yd)[0]
 
     def getFolder(self):
