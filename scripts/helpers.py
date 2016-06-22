@@ -85,11 +85,13 @@ def generate_cv_and_training_data_sets(input_file, cv_file, train_file,\
     # build the place_id matrix
     file_names = map(lambda x: '../split_train/' + str(x) + '_place', range(1, 23))
     use_cols = (0, 1)
-    load_data = lambda file_name: np.loadtxt(file_name, dtype = 'float', delimiter = ',',\
-        skiprows = 1, usecols = use_cols)
-    sub_matrices = map(load_data, file_names)
-    count_matrix = np.vstack(sub_matrices).astype(int)
-    count_dict = dict(count_matrix)
+    # load_data = lambda file_name: np.loadtxt(file_name, dtype = 'float', delimiter = ',',\
+    #     skiprows = 1, usecols = use_cols)
+    # sub_matrices = map(load_data, file_names)
+    # count_matrix = np.vstack(sub_matrices).astype(int)
+    cards = np.loadtxt('../place_ids_cardinality.txt', dtype = int)
+    cards_trans = map(lambda x: (x[1]. x[0]), cards)
+    count_dict = dict(cards_trans)
     del(sub_matrices)
     f = open(input_file, 'rb')
     fcsv = csv.reader(f)
