@@ -6,8 +6,9 @@ import numpy as np
 
 from sklearn.preprocessing import LabelEncoder, OneHotEncoder
 from sklearn.neighbors import KNeighborsClassifier
+from sklearn.cross_validation import train_test_split
 
-from helpers import BaseModel, days, hours, apk
+from helpers import BaseModel, days, hours, apk, quarter_days
 from grid_generation import Grid, get_grids
 
 base_grid = Grid(X = 800, Y = 400, xd = 200, yd = 100, pref = 'grid')
@@ -63,8 +64,9 @@ class SklearnModel(BaseModel):
         that help transform test data
         """
         days_v = np.array(map(days, X[:, 3])).reshape(-1, 1)
-        hours_v = np.array(map(days, X[:, 3])).reshape(-1, 1)
-        new_X = np.hstack((X[:, (0, 1, 2)], days_v, hours_v))
+        quarter_v = np.array(map(quarter_days, X[:, 3])).reshape(-1, 1)
+        new_X = np.hstack((X[:, (0, 1, 2)], days_v, quarter_v))
+        # new_X[:, 0] *= 800
         x_transformer = {}
         return (new_X, x_transformer)
 
@@ -131,6 +133,9 @@ class SklearnModel(BaseModel):
             return
         mask = np.array(map(lambda x: self.grid.M[m][n][x] > self.threshold, data[:, 5]))
         masked_data = data[mask, :]
+        if len(masked_data) < 10:
+            self.model[m][n]['model'] = None
+            return
         X, x_transformer = self.transform_x(masked_data[:, (1, 2, 3, 4)])
         Y, y_transformer = self.transform_y(masked_data[:, 5])
 
@@ -177,10 +182,10 @@ class SklearnModel(BaseModel):
         """
         print "predicting grid %s, %s" %(m, n)
         grid_data = np.array(grid_data)
-        temp_x = self.transform_x(grid_data[:, (1, 2, 3, 4)])[0]
         if self.model[m][n]['model'] == None:
-            top_3_placeids = np.array([[5348440074, 9988088517, 4048573921]]*len(temp_x))
+            top_3_placeids = np.array([[5348440074, 9988088517, 4048573921]]*len(grid_data))
         else:
+            temp_x = self.transform_x(grid_data[:, (1, 2, 3, 4)], self.model[m][n]['x_transformer'])[0]
             prediction_probs = self.model[m][n]['model'].predict_proba(temp_x)
             top_3_placeids = self.model[m][n]['y_transformer']['encoder'].inverse_transform(np.argsort(prediction_probs, axis=1)[:,::-1][:,:3])
 
@@ -222,4 +227,40 @@ class SklearnModel(BaseModel):
         preds = np.hstack((predictions, actual))
         apk_list = map(lambda row: apk(row[-1:], row[1: -1]), preds)
         self.cv_mean_precision = np.mean(apk_list)
+        print self.cv_mean_precision, "check cross validation function result"
         return self.cv_mean_precision
+
+    def train_first_grid_and_predict(self, m = 0, n = 0):
+        """
+        """
+        data = np.loadtxt(self.grid.getGridFile(0, 0), dtype = float, delimiter = ',')
+        train, test = train_test_split(data, test_size = 0.09)
+
+        mask = np.array(map(lambda x: self.grid.M[0][0][x] > self.threshold, train[:, 5]))
+        masked_train = train[mask, :]
+        X, x_transformer = self.transform_x(masked_train[:, (1, 2, 3, 4)])
+        Y, y_transformer = self.transform_y(masked_train[:, 5])
+
+        test_X = self.transform_x(test[:, (1, 2, 3, 4)], x_transformer)[0]
+
+        trained_clf = self.custom_classifier(X, Y)
+
+        print "Predicting the probablity of train set"
+        cv_mean_precision_train = self.get_cv(trained_clf, masked_train, y_transformer)
+        print cv_mean_precision_train, "training data prediction precision"
+
+        print "Predicting the probability of test set"
+        cv_mean_precision_test = self.get_cv(trained_clf, test, y_transformer)
+        print cv_mean_precision_test, "test data prediction precision"
+
+    def get_cv(self, clf, data, y_transformer):
+        """
+        """
+        X = self.transform_x(data[:, (1, 2, 3, 4)])[0]
+        prediction_probs = clf.predict_proba(X)
+        top_3 = y_transformer['encoder'].inverse_transform(np.argsort(prediction_probs, axis=1)[:,::-1][:,:3])
+        actual = data[:, -1].astype(int).reshape(-1, 1)
+        preds = np.hstack((top_3, actual))
+        print preds[:5]
+        apk_list = map(lambda row: apk(row[-1:], row[: -1]), preds)
+        return np.mean(apk_list)
