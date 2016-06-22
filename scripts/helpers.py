@@ -90,7 +90,7 @@ def generate_cv_and_training_data_sets(input_file, cv_file, train_file,\
     # sub_matrices = map(load_data, file_names)
     # count_matrix = np.vstack(sub_matrices).astype(int)
     cards = np.loadtxt('../place_ids_cardinality.txt', dtype = int)
-    cards_trans = map(lambda x: (x[1]. x[0]), cards)
+    cards_trans = map(lambda x: (x[1], x[0]), cards)
     count_dict = dict(cards_trans)
     del(sub_matrices)
     f = open(input_file, 'rb')
