@@ -8,7 +8,7 @@ from sklearn.preprocessing import LabelEncoder, OneHotEncoder
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.cross_validation import train_test_split
 
-from helpers import BaseModel, days, hours, apk, quarter_days
+from helpers import BaseModel, days, hours, apk, quarter_days, zip_file_and_upload_to_s3
 from grid_generation import Grid, get_grids
 
 base_grid = Grid(X = 800, Y = 400, xd = 200, yd = 100, pref = 'grid')
@@ -200,7 +200,7 @@ class SklearnModel(BaseModel):
 
         return np.hstack((grid_data[:, 0].reshape(-1, 1), top_3_placeids))
 
-    def generate_submission_file(self, submission_file):
+    def generate_submission_file(self, submission_file, upload_to_s3 = False):
         """
         Generate the submission file using the trained model in each indivudual grid
         """
@@ -218,6 +218,8 @@ class SklearnModel(BaseModel):
             if i % 1000000 == 0:
                 print "Generating %s row of test data" %(i)
         submission.close()
+        if upload_to_s3:
+            zip_file_and_upload_to_s3(submission_file)
 
     def check_cross_validation(self):
         """
