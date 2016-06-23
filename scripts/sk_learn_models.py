@@ -79,7 +79,7 @@ class KNN_feature_weights(SklearnModel):
 
     def custom_classifier(self, X, Y):
         clf = KNeighborsClassifier(n_neighbors = 16, weights = 'distance', metric = 'manhattan')
-        clf.fig(X, np.ravel(Y)
+        clf.fit(X, np.ravel(Y))
         return clf
 
 
