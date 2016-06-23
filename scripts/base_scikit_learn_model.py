@@ -105,6 +105,7 @@ class SklearnModel(BaseModel):
         """
         trained_model_file = self.grid.getFolder() + self.description + '_' +\
             'grid_model_pickle.pkl'
+        train_init_time = time.time()
 
         # if (not os.path.exists(trained_model_file)) or force:
         #     for m in range(self.grid.max_m + 1):
@@ -114,17 +115,20 @@ class SklearnModel(BaseModel):
         #     pickle.dump(self.model, open(trained_model_file, 'wb'))
         # else:
         #     self.model = pickle.load(open(trained_model_file), 'rb')
-
         for m in range(self.grid.max_m + 1):
+            print "training grid row %s" %(m)
+            init_time = time.time()
             for n in range(self.grid.max_n + 1):
                 # train each grid seperately
                 self.train_grid(m, n)
+            print "Time take to train grid row %s is %s" %(m, time.time() - init_time)
+        self.train_time = time.time() - train_init_time
 
     def train_grid(self, m, n):
         """
         Helper function for train function that takes the grid cell to be trained
         """
-        print "Training %s, %s grid" %(m, n)
+        # print "Training %s, %s grid" %(m, n)
         init_time = time.time()
         data = np.loadtxt(self.grid.getGridFile(m, n), dtype = float, delimiter = ',')
         if len(data) == 0 or len(data.shape) == 1:
@@ -149,8 +153,8 @@ class SklearnModel(BaseModel):
         else:
             self.model[m][n]['model'] = self.custom_classifier(X, Y)
 
-        print "Time taken to train grid %s, %s is: %s" %(m, n, time.time() - init_time)
-        print "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
+        # print "Time taken to train grid %s, %s is: %s" %(m, n, time.time() - init_time)
+        # print "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
 
 
     def predict(self, test_data):
@@ -159,6 +163,7 @@ class SklearnModel(BaseModel):
         row_id, x, y, a, time, (place_id)
         place_id is optional
         """
+        predict_init_time = time.time()
         max_m = len(self.grid.M)
         max_n = len(self.grid.M[0])
         grid_wise_data = [[[] for n in range(max_n + 1)]\
@@ -170,12 +175,16 @@ class SklearnModel(BaseModel):
 
         predictions = []
         for m in range(self.grid.max_m + 1):
+            print "predicting row %s" %(m)
+            init_time = time.time()
             for n in range(self.grid.max_n + 1):
                 if len(grid_wise_data[m][n]) > 0:
                     predictions.append(self.predict_grid(np.array(grid_wise_data[m][n]), m, n))
+            print "time taken to predict grid row %s is: %s" %(m, time.time() - init_time)
 
         predictions = np.vstack(tuple(predictions)).astype(int)
         sorted_row_predictions = predictions[predictions[:, 0].argsort()]
+        self.predict_time = time.time() - predict_init_time
         return sorted_row_predictions
 
     def predict_grid(self, grid_data, m, n):
@@ -183,7 +192,7 @@ class SklearnModel(BaseModel):
         grid_data is test/cv data from that particular grid
         return row_id, and top 3 predictions
         """
-        print "predicting grid %s, %s" %(m, n)
+        # print "predicting grid %s, %s" %(m, n)
         grid_data = np.array(grid_data)
         if self.model[m][n]['model'] == None:
             top_3_placeids = np.array([[5348440074, 9988088517, 4048573921]]*len(grid_data))
@@ -204,6 +213,7 @@ class SklearnModel(BaseModel):
         """
         Generate the submission file using the trained model in each indivudual grid
         """
+        submission_init_time = time.time()
         test_data = np.loadtxt(self.test_file, dtype = float, delimiter = ',')
         predictions = self.predict(test_data)
         predictions = predictions.astype(int)
@@ -220,6 +230,7 @@ class SklearnModel(BaseModel):
         submission.close()
         if upload_to_s3:
             zip_file_and_upload_to_s3(submission_file)
+        self.submission_time = time.time() - submission_init_time
 
     def check_cross_validation(self):
         """
