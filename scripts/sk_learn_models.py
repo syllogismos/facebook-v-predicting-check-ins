@@ -49,7 +49,38 @@ class KNN(SklearnModel):
         clf.fit(X, np.ravel(Y))
         return clf
 
+class KNN_feature_weights(SklearnModel):
 
+    def transform_x(self, X, x_transformer = None):
+        """
+        X = [[x, y, a, t]]
+        """
+        fw = [500., 1000., 4., 3., 2., 10., 10.]
+        minute_v = X[:, 3]%60
+        hour_v = X[:, 3]//60
+        weekday_v = hour_v//24
+        month_v = weekday_v//30
+        year_v = (weekday_v//365 + 1)*fw[5]
+        hour_v = ((hour_v%24 + 1) + minute_v/60.0)*fw[2]
+        weekday_v = (weekday_v%7 + 1)*fw[3]
+        month_v = (month_v%12 +1)*fw[4]
+        accuracy_v = np.log10(X[:, 2])*fw[6]
+        x_v = X[:, 0]*fw[0]
+        y_v = X[:, 1]*fw[1]
+        new_X = np.hstack((x_v.reshape(-1, 1),\
+                         y_v.reshape(-1, 1),\
+                         accuracy_v.reshape(-1, 1),\
+                         hour_v.reshape(-1, 1),\
+                         weekday_v.reshape(-1, 1),\
+                         month_v.reshape(-1, 1),\
+                         year_v.reshape(-1, 1)))
+        return (new_X, x_transformer)
+
+
+    def custom_classifier(self, X, Y):
+        clf = KNeighborsClassifier(n_neighbors = 16, weights = 'distance', metric = 'manhattan')
+        clf.fig(X, np.ravel(Y)
+        return clf
 
 
 class top_3_using_knn_model(SklearnModel):
