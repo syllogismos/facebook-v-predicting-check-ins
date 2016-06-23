@@ -5,12 +5,35 @@ import numpy as np
 import random
 from tqdm import tqdm
 from scipy import stats
+import zipfile, zlib, boto, boto.s3, sys, aws_config, os
+from boto.s3.key import Key
 
 start_date = datetime.datetime(2016, 5, 1)
 
 days = lambda t: (int(t) % (86400*7))/ 86400
 hours = lambda t: (int(t) % 86400) / 3600
 quarter_days = lambda t: (int(t) % 86400) / (3600 * 4)
+
+def zip_file_and_upload_to_s3(file_name, bucket_name = 'fb_submissions'):
+    # base_name = os.path.basename(file_name)
+    compression = zipfile.ZIP_DEFLATED
+    zip_file_name = file_name + '.zip'
+    zf = zipfile.ZipFile(zip_file_name, mode = 'w')
+    print "Compressing file"
+    zf.write(file_name, compress_type = compression)
+    print "Compression done"
+    zf.close()
+
+    conn = boto.connect_s3(aws_config.AWS_ACCESS_KEY, aws_config.AWS_SECRET_ACCESS_KEY)
+    bucket = conn.get_bucket(bucket_name)
+
+    print "uploading file to s3 %s" %(zip_file_name)
+
+    k = Key(bucket)
+    k.key = str(datetime.datetime.now())[:-7] + ' ' + os.path.basename(zip_file_name)
+    k.set_contents_from_filename(zip_file_name)
+    print "uploading to s3 done"
+
 
 def apk(actual, predicted, k=3):
     """

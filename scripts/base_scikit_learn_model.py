@@ -127,7 +127,8 @@ class SklearnModel(BaseModel):
         print "Training %s, %s grid" %(m, n)
         init_time = time.time()
         data = np.loadtxt(self.grid.getGridFile(m, n), dtype = float, delimiter = ',')
-        if len(data) == 0:
+        if len(data) == 0 or len(data.shape) == 1:
+            # if the data contains only one row then also make model None
             # if the grid contains barely zero data, make model None
             self.model[m][n]['model'] = None
             return
@@ -158,8 +159,10 @@ class SklearnModel(BaseModel):
         row_id, x, y, a, time, (place_id)
         place_id is optional
         """
-        grid_wise_data = [[[] for n in range(self.grid.max_n + 1)]\
-            for m in range(self.grid.max_m + 1)]
+        max_m = len(self.grid.M)
+        max_n = len(self.grid.M[0])
+        grid_wise_data = [[[] for n in range(max_n + 1)]\
+            for m in range(max_m + 1)]
         print "Computing grid_wise_data from test_data"
         for i in range(len(test_data)):
             m, n = get_grids_of_a_point((test_data[i][1], test_data[i][2]), self.grid)[0]
@@ -233,10 +236,10 @@ class SklearnModel(BaseModel):
     def train_first_grid_and_predict(self, m = 0, n = 0):
         """
         """
-        data = np.loadtxt(self.grid.getGridFile(0, 0), dtype = float, delimiter = ',')
+        data = np.loadtxt(self.grid.getGridFile(m, n), dtype = float, delimiter = ',')
         train, test = train_test_split(data, test_size = 0.09)
 
-        mask = np.array(map(lambda x: self.grid.M[0][0][x] > self.threshold, train[:, 5]))
+        mask = np.array(map(lambda x: self.grid.M[m][n][x] > self.threshold, train[:, 5]))
         masked_train = train[mask, :]
         X, x_transformer = self.transform_x(masked_train[:, (1, 2, 3, 4)])
         Y, y_transformer = self.transform_y(masked_train[:, 5])
