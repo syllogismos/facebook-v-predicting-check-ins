@@ -13,6 +13,7 @@ from base_scikit_learn_model import SklearnModel, get_grids_of_a_point
 import numpy as np
 import os
 import pickle
+import pdb
 
 from multiprocessing import Pool
 
@@ -190,8 +191,8 @@ class XGB_Model(SklearnModel):
 
         print "converting cv data to grid wise"
         for i in range(len(cv_data)):
-            m, n = get_grids_of_a_point((test_data[i][1], test_data[i][2]), self.grid)[0]
-            test_grid_wise_data[m][n].append(test_data[i])
+            m, n = get_grids_of_a_point((cv_data[i][1], cv_data[i][2]), self.grid)[0]
+            cv_grid_wise_data[m][n].append(cv_data[i])
 
         test_preds = []
         cv_preds = []
@@ -205,7 +206,7 @@ class XGB_Model(SklearnModel):
                 if len(cv_grid_wise_data[m][n]) > 0:
                     cv_preds.append(self.predict_grid(np.array(cv_grid_wise_data[m][n]), m, n))
                 self.model[m][n]['model'] = None
-
+        # pdb.set_trace()
         test_preds = np.vstack(tuple(test_preds)).astype(int)
         cv_preds = np.vstack(tuple(cv_preds)).astype(int)
 
