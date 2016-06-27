@@ -14,6 +14,8 @@ import numpy as np
 import os
 import pickle
 
+from multiprocessing import Pool
+
 grid = Grid(X = 400, Y = 100, xd = 50, yd = 10, pref = 'grid1', train_file = '../main_train_0.02_5.csv')
 
 def map3eval(preds, dtrain):
@@ -27,7 +29,7 @@ def map3eval(preds, dtrain):
 
 class XGB_Model(SklearnModel):
 
-    def transform_x1(X, x_transformer = None):
+    def transform_x(X, x_transformer = None):
         """
         X = [[x, y, a, t]]
         """
@@ -68,6 +70,17 @@ class XGB_Model(SklearnModel):
         dtrain = xgb.DMatrix(X, label=np.ravel(Y))
         return xgb.train(param, dtrain, num_round, feval = map3eval)
 
+    # def train_row(self, i):
+    #     return map(lambda x: self.train_grid(i, x), range(self.grid.max_n + 1))
+
+    # def train(self):
+    #     pool = Pool(processes = 4)
+    #     m = self.grid.max_m + 1
+    #     n = self.grid.max_n + 1
+    #     result = pool.apply_async(self.train_row, range(m))
+    #     result.get()
+    #     pass
+
     def train_grid(self, m, n):
         """
         Helper function for train function that takes the grid cell to be trained
@@ -96,6 +109,7 @@ class XGB_Model(SklearnModel):
             self.model[m][n]['model'] = None
         else:
             self.model[m][n]['model'] = self.custom_classifier(X, Y, y_transformer)
+        # return True
 
         # print "Time taken to train grid %s, %s is: %s" %(m, n, time.time() - init_time)
         # print "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
