@@ -6,9 +6,9 @@ from grid_generation import get_top_3_places_of_dict, get_grids
 from helpers import days, hours, quarter_days
 from sklearn import preprocessing
 from sklearn.cross_validation import train_test_split
-from helpers import apk
+from helpers import apk, zip_file_and_upload_to_s3
 
-from base_scikit_learn_model import SklearnModel
+from base_scikit_learn_model import SklearnModel, get_grids_of_a_point
 
 import numpy as np
 import os
@@ -29,7 +29,7 @@ def map3eval(preds, dtrain):
 
 class XGB_Model(SklearnModel):
 
-    def transform_x(X, x_transformer = None):
+    def transform_x(self, X, x_transformer = None):
         """
         X = [[x, y, a, t]]
         """
@@ -172,5 +172,60 @@ class XGB_Model(SklearnModel):
         print preds[:5]
         apk_list = map(lambda row: apk(row[-1:], row[: -1]), preds)
         return np.mean(apk_list)
+
+    def train_and_predict(self, submission_file, upload_to_s3 = False):
+        cv_data = np.loadtxt(self.cross_validation_file, dtype = float, delimiter = ',')
+        test_data = np.loadtxt(self.test_file, dtype = float, delimiter = ',')
+        max_m = self.grid.max_m
+        max_n = self.grid.max_n
+        test_grid_wise_data = [[[] for n in range(max_n + 1)]\
+            for m in range(max_m + 1)]
+        cv_grid_wise_data = [[[] for n in range(max_n + 1)]\
+            for m in range(max_m + 1)]
+
+        for i in range(len(test_data)):
+            m, n = get_grids_of_a_point((test_data[i][1], test_data[i][2]), self.grid)[0]
+            test_grid_wise_data[m][n].append(test_data[i])
+
+        for i in range(len(cv_data)):
+            m, n = get_grids_of_a_point((test_data[i][1], test_data[i][2]), self.grid)[0]
+            test_grid_wise_data[m][n].append(test_data[i])
+
+        test_preds = []
+        cv_preds = []
+
+        for m in range(max_m + 1):
+            print "row %s training and predicting" %(m)
+            for n in range(max_n + 1):
+                self.train_grid(m, n)
+                test_preds.append(self.predict_grid(np.array(test_grid_wise_data[m][n]), m, n))
+                cv_preds.append(self.predict_grid(np.array(cv_grid_wise_data[m][n]), m, n))
+                self.model[m][n]['model'] = None
+
+        test_preds = np.vstack(tuple(test_preds)).astype(int)
+        cv_preds = np.vstack(tuple(cv_preds)).astype(int)
+
+        sorted_test = test_preds[test_preds[:, 0].argsort()]
+        sorted_cv = cv_preds[cv_preds[:, 0].argsort()]
+
+        actual_cv = cv_data[:, -1].astype(int).reshape(-1, 1)
+        cv_a_p = np.hstack((sorted_cv, actual_cv))
+        apk_list = map(lambda row: apk(row[-1:], row[1:-1]), cv_a_p)
+        self.cv_mean_precision = np.mean(apk_list)
+        print "mean precision of cross validation set", str(self.cv_mean_precision)
+
+        sorted_test = sorted_test.astype(str)
+        submission = open(submission_file, 'wb')
+        submission.write('row_id,place_id\n')
+        for i in range(len(sorted_test)):
+            row = sorted_test[i]
+            row_id = row[0]
+            row_prediction_string = ' '.join(row[1:])
+            submission.write(row_id + ',' + row_prediction_string + '\n')
+            if i % 1000000 == 0:
+                print "generating %s row of test data" %(i)
+        submission.close()
+        if upload_to_s3:
+            zip_file_and_upload_to_s3(submission_file)
 
 
