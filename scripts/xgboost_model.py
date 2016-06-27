@@ -183,10 +183,12 @@ class XGB_Model(SklearnModel):
         cv_grid_wise_data = [[[] for n in range(max_n + 1)]\
             for m in range(max_m + 1)]
 
+        print "converting test data to grid wise"
         for i in range(len(test_data)):
             m, n = get_grids_of_a_point((test_data[i][1], test_data[i][2]), self.grid)[0]
             test_grid_wise_data[m][n].append(test_data[i])
 
+        print "converting cv data to grid wise"
         for i in range(len(cv_data)):
             m, n = get_grids_of_a_point((test_data[i][1], test_data[i][2]), self.grid)[0]
             test_grid_wise_data[m][n].append(test_data[i])
@@ -198,8 +200,10 @@ class XGB_Model(SklearnModel):
             print "row %s training and predicting" %(m)
             for n in range(max_n + 1):
                 self.train_grid(m, n)
-                test_preds.append(self.predict_grid(np.array(test_grid_wise_data[m][n]), m, n))
-                cv_preds.append(self.predict_grid(np.array(cv_grid_wise_data[m][n]), m, n))
+                if len(test_grid_wise_data[m][n]) > 0:
+                    test_preds.append(self.predict_grid(np.array(test_grid_wise_data[m][n]), m, n))
+                if len(cv_grid_wise_data[m][n]) > 0:
+                    cv_preds.append(self.predict_grid(np.array(cv_grid_wise_data[m][n]), m, n))
                 self.model[m][n]['model'] = None
 
         test_preds = np.vstack(tuple(test_preds)).astype(int)
