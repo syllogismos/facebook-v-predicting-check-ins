@@ -328,7 +328,7 @@ class XGB_Model(SklearnModel):
         state['test_grid'] = test_grid_wise_data
         state['threshold'] = self.threshold
 
-        p = Pool(8)
+        p = Pool(12)
         row_results = p.map(StateLoader(state), range(self.grid.max_m + 1))
         print "Training time of parallel processing %s" %(time.time() - init_time)
         # row_results = map(StateLoader(state), range(self.grid.max_m - 1, self.grid.max_m + 1))
