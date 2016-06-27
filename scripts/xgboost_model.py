@@ -5,6 +5,7 @@ from grid_generation import Grid, generate_grid_wise_cardinality_and_training_fi
 from grid_generation import get_top_3_places_of_dict, get_grids
 from helpers import days, hours, quarter_days
 from sklearn import preprocessing
+from sklearn.preprocessing import LabelEncoder
 from sklearn.cross_validation import train_test_split
 from helpers import apk, zip_file_and_upload_to_s3
 
@@ -28,48 +29,175 @@ def map3eval(preds, dtrain):
     metric /= actual.shape[0]
     return 'MAP@3', metric
 
+class StateLoader(object):
+    def __init__(self, state):
+        self.state = state
+    def __call__(self, row):
+        return train_row(row, self.state)
+"""
+State:
+    grid
+    cv_grid
+    test_grid
+state = {
+    'grid': Grid,
+    'cv_grid': mxn matrix
+    'test_grid': mxn matrix
+    'threshold': 5
+"""
+def train_row(i, state):
+    print "processing row %s" %(i)
+    test_preds = []
+    cv_preds = []
+    for n in range(state['grid'].max_n + 1):
+        print "processing column %s of row %s" %(n, i)
+        clf, x_transformer, y_transformer = train_single_grid_cell(i, n, state)
+        if len(state['test_grid'][i][n]) > 0:
+            test_preds.append(predict_single_grid_cell(state['test_grid'][i][n], \
+                clf, x_transformer, y_transformer))
+        if len(state['cv_grid'][i][n]) > 0:
+            cv_preds.append(predict_single_grid_cell(state['cv_grid'][i][n], \
+                clf, x_transformer, y_transformer))
+
+    if len(test_preds) > 0:
+        test_row = np.vstack(test_preds)
+    else:
+        test_row = None
+    if len(cv_preds) > 0:
+        cv_row = np.vstack(cv_preds)
+    else:
+        cv_row = None
+
+    return (test_row, cv_row)
+
+def train_single_grid_cell(m, n, state):
+    data = np.loadtxt(state['grid'].getGridFile(m, n), dtype = float, delimiter = ',')
+    if len(data) == 0 or len(data.shape) == 1:
+        return None, None, None
+    mask = np.array(map(lambda x: state['grid'].M[m][n][x] > state['threshold'], data[:, 5]))
+    masked_data = data[mask, :]
+    if len(masked_data) < 10:
+        return None, None, None
+    X, x_transformer = trans_x(masked_data[:, (1, 2, 3, 4)])
+    Y, y_transformer = trans_y(masked_data[:, 5])
+
+    if len(Y) == 0:
+        return None, None, None
+    else:
+        return classifier(X, Y, y_transformer), x_transformer, y_transformer
+    pass
+
+def predict_single_grid_cell(X, clf, x_transformer, y_transformer):
+    data = np.array(X)
+    if clf == None:
+        top_3_placeids = np.array([[5348440074, 9988088517, 4048573921]]*len(grid_data))
+    else:
+        temp_x = trans_x(data[:, (1, 2, 3, 4)], x_transformer)[0]
+        dtest = xgb.DMatrix(temp_x)
+        prediction_probs = clf.predict(dtest)
+        top_3_placeids = y_transformer['encoder'].inverse_transform(np.argsort(prediction_probs, axis = 1)[:, ::-1][:, :3])
+        x, y = top_3_placeids.shape
+        if y < 3:
+            temp_array = np.array([[5348440074]*(3-y)]*len(top_3_placeids))
+            top_3_placeids = np.hstack((top_3_placeids, temp_array))
+    return np.hstack((data[:, 0].reshape(-1, 1), top_3_placeids))
+
+def trans_x(X, x_transformer = None):
+    """
+    X = [[x, y, a, t]]
+    """
+    fw = [1., 1., 1., 1., 1., 1., 1.]
+    minute_v = X[:, 3]%60
+    hour_v = X[:, 3]//60
+    weekday_v = hour_v//24
+    month_v = weekday_v//30
+    year_v = (weekday_v//365 + 1)*fw[5]
+    hour_v = ((hour_v%24 + 1) + minute_v/60.0)*fw[2]
+    weekday_v = (weekday_v%7 + 1)*fw[3]
+    month_v = (month_v%12 +1)*fw[4]
+    accuracy_v = np.log10(X[:, 2])*fw[6]
+    x_v = X[:, 0]*fw[0]
+    y_v = X[:, 1]*fw[1]
+    X_new = np.hstack((x_v.reshape(-1, 1),\
+                     y_v.reshape(-1, 1),\
+                     accuracy_v.reshape(-1, 1),\
+                     hour_v.reshape(-1, 1),\
+                     weekday_v.reshape(-1, 1),\
+                     month_v.reshape(-1, 1),\
+                     year_v.reshape(-1, 1)))
+    return (X_new, x_transformer)
+
+def trans_y(y, y_transformer = None):
+    """
+    place_ids to encoded array
+    """
+    y = y.astype(int)
+    if y_transformer == None:
+        label_encoder = LabelEncoder()
+        label_encoder.fit(y)
+        y_transformer = {'encoder': label_encoder}
+    new_y = y_transformer['encoder'].transform(y).reshape(-1, 1)
+    return (new_y, y_transformer)
+
+def classifier(X, Y, y_transformer):
+    param = {}
+    # use softmax multi-class classification
+    param['objective'] = 'multi:softprob'
+    # scale weight of positive examples
+    param['eta'] = 0.1
+    param['max_depth'] = 6
+    param['silent'] = 1
+    param['nthread'] = 4
+    param['num_class'] = len(y_transformer['encoder'].classes_)
+    param['eval_metric'] = ['merror', 'mlogloss']
+    num_round = 25
+    dtrain = xgb.DMatrix(X, label=np.ravel(Y))
+    return xgb.train(param, dtrain, num_round, feval = map3eval)
+
 class XGB_Model(SklearnModel):
 
     def transform_x(self, X, x_transformer = None):
         """
         X = [[x, y, a, t]]
         """
-        fw = [1., 1., 1., 1., 1., 1., 1.]
-        minute_v = X[:, 3]%60
-        hour_v = X[:, 3]//60
-        weekday_v = hour_v//24
-        month_v = weekday_v//30
-        year_v = (weekday_v//365 + 1)*fw[5]
-        hour_v = ((hour_v%24 + 1) + minute_v/60.0)*fw[2]
-        weekday_v = (weekday_v%7 + 1)*fw[3]
-        month_v = (month_v%12 +1)*fw[4]
-        accuracy_v = np.log10(X[:, 2])*fw[6]
-        x_v = X[:, 0]*fw[0]
-        y_v = X[:, 1]*fw[1]
-        X_new = np.hstack((x_v.reshape(-1, 1),\
-                         y_v.reshape(-1, 1),\
-                         accuracy_v.reshape(-1, 1),\
-                         hour_v.reshape(-1, 1),\
-                         weekday_v.reshape(-1, 1),\
-                         month_v.reshape(-1, 1),\
-                         year_v.reshape(-1, 1)))
-        return (X_new, x_transformer)
+        return trans_x(X, x_transformer)
+        # fw = [1., 1., 1., 1., 1., 1., 1.]
+        # minute_v = X[:, 3]%60
+        # hour_v = X[:, 3]//60
+        # weekday_v = hour_v//24
+        # month_v = weekday_v//30
+        # year_v = (weekday_v//365 + 1)*fw[5]
+        # hour_v = ((hour_v%24 + 1) + minute_v/60.0)*fw[2]
+        # weekday_v = (weekday_v%7 + 1)*fw[3]
+        # month_v = (month_v%12 +1)*fw[4]
+        # accuracy_v = np.log10(X[:, 2])*fw[6]
+        # x_v = X[:, 0]*fw[0]
+        # y_v = X[:, 1]*fw[1]
+        # X_new = np.hstack((x_v.reshape(-1, 1),\
+        #                  y_v.reshape(-1, 1),\
+        #                  accuracy_v.reshape(-1, 1),\
+        #                  hour_v.reshape(-1, 1),\
+        #                  weekday_v.reshape(-1, 1),\
+        #                  month_v.reshape(-1, 1),\
+        #                  year_v.reshape(-1, 1)))
+        # return (X_new, x_transformer)
 
 
     def custom_classifier(self, X, Y, y_transformer):
-        param = {}
-        # use softmax multi-class classification
-        param['objective'] = 'multi:softprob'
-        # scale weight of positive examples
-        param['eta'] = 0.1
-        param['max_depth'] = 6
-        param['silent'] = 1
-        param['nthread'] = 4
-        param['num_class'] = len(y_transformer['encoder'].classes_)
-        param['eval_metric'] = ['merror', 'mlogloss']
-        num_round = 25
-        dtrain = xgb.DMatrix(X, label=np.ravel(Y))
-        return xgb.train(param, dtrain, num_round, feval = map3eval)
+        classifier(X, Y, y_transformer)
+        # param = {}
+        # # use softmax multi-class classification
+        # param['objective'] = 'multi:softprob'
+        # # scale weight of positive examples
+        # param['eta'] = 0.1
+        # param['max_depth'] = 6
+        # param['silent'] = 1
+        # param['nthread'] = 4
+        # param['num_class'] = len(y_transformer['encoder'].classes_)
+        # param['eval_metric'] = ['merror', 'mlogloss']
+        # num_round = 25
+        # dtrain = xgb.DMatrix(X, label=np.ravel(Y))
+        # return xgb.train(param, dtrain, num_round, feval = map3eval)
 
     # def train_row(self, i):
     #     return map(lambda x: self.train_grid(i, x), range(self.grid.max_n + 1))
@@ -173,6 +301,69 @@ class XGB_Model(SklearnModel):
         print preds[:5]
         apk_list = map(lambda row: apk(row[-1:], row[: -1]), preds)
         return np.mean(apk_list)
+
+    def train_and_predict_parallel(self, submission_file, upload_to_s3 = False):
+        init_time = time.time()
+        cv_data = np.loadtxt(self.cross_validation_file, dtype = float, delimiter = ',')
+        test_data = np.loadtxt(self.test_file, dtype = float, delimiter = ',')
+        test_grid_wise_data = [[[] for n in range(self.grid.max_n + 1)]\
+            for m in range(self.grid.max_m + 1)]
+        cv_grid_wise_data = [[[] for n in range(self.grid.max_n + 1)]\
+            for m in range(self.grid.max_m + 1)]
+
+        print "converting test data to grid wise"
+        for i in range(len(test_data)):
+            m, n = get_grids_of_a_point((test_data[i][1], test_data[i][2]), self.grid)[0]
+            test_grid_wise_data[m][n].append(test_data[i])
+
+        print "converting cv data to grid wise"
+        for i in range(len(cv_data)):
+            m, n = get_grids_of_a_point((cv_data[i][1], cv_data[i][2]), self.grid)[0]
+            cv_grid_wise_data[m][n].append(cv_data[i])
+
+        state = {}
+        state['grid'] = self.grid
+        state['cv_grid'] = cv_grid_wise_data
+        state['test_grid'] = test_grid_wise_data
+        state['threshold'] = self.threshold
+
+        p = Pool(8)
+        row_results = p.map(StateLoader(state), range(self.grid.max_m + 1))
+        print "Training time of parallel processing %s" %(time.time() - init_time)
+        # row_results = map(StateLoader(state), range(self.grid.max_m - 1, self.grid.max_m + 1))
+        # pdb.set_trace()
+        test_rows = map(lambda x: x[0], row_results)
+        cv_rows = map(lambda x: x[1], row_results)
+
+        test_rows = filter(lambda x: x != None, test_rows)
+        cv_rows = filter(lambda x: x != None, cv_rows)
+
+        # pdb.set_trace()
+        test_preds = np.vstack(test_rows).astype(int)
+        cv_preds = np.vstack(cv_rows).astype(int)
+
+        sorted_test = test_preds[test_preds[:, 0].argsort()]
+        sorted_cv = cv_preds[cv_preds[:, 0].argsort()]
+
+        actual_cv = cv_data[:, -1].astype(int).reshape(-1, 1)
+        cv_a_p = np.hstack((sorted_cv, actual_cv))
+        apk_list = map(lambda row: apk(row[-1:], row[1:-1]), cv_a_p)
+        self.cv_mean_precision = np.mean(apk_list)
+        print "mean precision of cross validation set", str(self.cv_mean_precision)
+
+        sorted_test = sorted_test.astype(str)
+        submission = open(submission_file, 'wb')
+        submission.write('row_id,place_id\n')
+        for i in range(len(sorted_test)):
+            row = sorted_test[i]
+            row_id = row[0]
+            row_prediction_string = ' '.join(row[1:])
+            submission.write(row_id + ',' + row_prediction_string + '\n')
+            if i % 1000000 == 0:
+                print "generating %s row of test data" %(i)
+        submission.close()
+        if upload_to_s3:
+            zip_file_and_upload_to_s3(submission_file)
 
     def train_and_predict(self, submission_file, upload_to_s3 = False):
         cv_data = np.loadtxt(self.cross_validation_file, dtype = float, delimiter = ',')
