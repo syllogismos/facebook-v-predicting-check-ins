@@ -50,7 +50,8 @@ def train_row(i, state):
     test_preds = []
     cv_preds = []
     for n in range(state['grid'].max_n + 1):
-        print "processing column %s of row %s" %(n, i)
+        if n % 10 == 0:
+            print "processing column %s of row %s" %(n, i)
         clf, x_transformer, y_transformer = train_single_grid_cell(i, n, state)
         if len(state['test_grid'][i][n]) > 0:
             test_preds.append(predict_single_grid_cell(state['test_grid'][i][n], \
@@ -90,7 +91,7 @@ def train_single_grid_cell(m, n, state):
 def predict_single_grid_cell(X, clf, x_transformer, y_transformer):
     data = np.array(X)
     if clf == None:
-        top_3_placeids = np.array([[5348440074, 9988088517, 4048573921]]*len(grid_data))
+        top_3_placeids = np.array([[5348440074, 9988088517, 4048573921]]*len(data))
     else:
         temp_x = trans_x(data[:, (1, 2, 3, 4)], x_transformer)[0]
         dtest = xgb.DMatrix(temp_x)
