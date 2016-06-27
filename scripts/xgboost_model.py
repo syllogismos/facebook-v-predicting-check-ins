@@ -47,6 +47,7 @@ state = {
 """
 def train_row(i, state):
     print "processing row %s" %(i)
+    init_row_time = time.time()
     test_preds = []
     cv_preds = []
     for n in range(state['grid'].max_n + 1):
@@ -69,6 +70,7 @@ def train_row(i, state):
     else:
         cv_row = None
 
+    print "time taken for row %s is %s" %(i, time.time() - init_row_time())
     return (test_row, cv_row)
 
 def train_single_grid_cell(m, n, state):
