@@ -70,7 +70,7 @@ def train_row(i, state):
     else:
         cv_row = None
 
-    print "time taken for row %s is %s" %(i, time.time() - init_row_time())
+    print "time taken for row %s is %s" %(i, time.time() - init_row_time)
     return (test_row, cv_row)
 
 def train_single_grid_cell(m, n, state):
@@ -330,7 +330,7 @@ class XGB_Model(SklearnModel):
         state['test_grid'] = test_grid_wise_data
         state['threshold'] = self.threshold
 
-        p = Pool(12)
+        p = Pool(10)
         row_results = p.map(StateLoader(state), range(self.grid.max_m + 1))
         print "Training time of parallel processing %s" %(time.time() - init_time)
         # row_results = map(StateLoader(state), range(self.grid.max_m - 1, self.grid.max_m + 1))
