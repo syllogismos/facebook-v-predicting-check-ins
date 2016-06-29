@@ -60,6 +60,7 @@ def train_row(i, state):
         if len(state['cv_grid'][i][n]) > 0:
             cv_preds.append(predict_single_grid_cell(state['cv_grid'][i][n], \
                 clf, x_transformer, y_transformer))
+        del(clf)
 
     if len(test_preds) > 0:
         test_row = np.vstack(test_preds)
@@ -153,7 +154,7 @@ def classifier(X, Y, y_transformer):
     param['nthread'] = 4
     param['num_class'] = len(y_transformer['encoder'].classes_)
     param['eval_metric'] = ['merror', 'mlogloss']
-    num_round = 25
+    num_round = 15
     dtrain = xgb.DMatrix(X, label=np.ravel(Y))
     return xgb.train(param, dtrain, num_round, feval = map3eval)
 
