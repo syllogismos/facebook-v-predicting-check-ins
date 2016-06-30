@@ -131,11 +131,11 @@ def get_map_of_xgb(grid_param):
                      'nthread': 8,
                      'eta': 0.1,
                      'objective': 'multi:softprob',
-                     'max_depth': 9,
+                     'max_depth': 13,
                      'min_child_weight': 5,
-                     'gamma': 0,
-                     'subsample': 0.8,
-                     'colsample_bytree': 0.8,
+                     'gamma': 0.3,
+                     'subsample': 0.9,
+                     'colsample_bytree': 0.7,
                      'scale_pos_weight': 1
                   }
     orig_params.update(grid_param)
