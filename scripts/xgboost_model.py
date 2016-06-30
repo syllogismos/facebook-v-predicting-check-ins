@@ -117,6 +117,11 @@ def trans_x(X, x_transformer = None):
     month_v = weekday_v//30
     year_v = (weekday_v//365 + 1)*fw[5]
     hour_v = ((hour_v%24 + 1) + minute_v/60.0)*fw[2]
+    hour_v_2 = (X[:, 3]%(60*60*24))//(60*60*2)
+    hour_v_3 = (X[:, 3]%(60*60*24))//(60*60*3)
+    hour_v_4 = (X[:, 3]%(60*60*24))//(60*60*4)
+    hour_v_6 = (X[:, 3]%(60*60*24))//(60*60*6)
+    hour_v_8 = (X[:, 3]%(60*60*24))//(60*60*8)
     weekday_v = (weekday_v%7 + 1)*fw[3]
     month_v = (month_v%12 +1)*fw[4]
     accuracy_v = np.log10(X[:, 2])*fw[6]
@@ -126,6 +131,11 @@ def trans_x(X, x_transformer = None):
                      y_v.reshape(-1, 1),\
                      accuracy_v.reshape(-1, 1),\
                      hour_v.reshape(-1, 1),\
+                     hour_v_2.reshape(-1, 1),\
+                     hour_v_3.reshape(-1, 1),\
+                     hour_v_4.reshape(-1, 1),\
+                     hour_v_6.reshape(-1, 1),\
+                     hour_v_8.reshape(-1, 1),\
                      weekday_v.reshape(-1, 1),\
                      month_v.reshape(-1, 1),\
                      year_v.reshape(-1, 1)))
@@ -154,7 +164,7 @@ def classifier(X, Y, y_transformer):
     param['nthread'] = 4
     param['num_class'] = len(y_transformer['encoder'].classes_)
     param['eval_metric'] = ['merror', 'mlogloss']
-    num_round = 15
+    num_round = 27
     dtrain = xgb.DMatrix(X, label=np.ravel(Y))
     return xgb.train(param, dtrain, num_round, feval = map3eval)
 
@@ -202,17 +212,6 @@ class XGB_Model(SklearnModel):
         # num_round = 25
         # dtrain = xgb.DMatrix(X, label=np.ravel(Y))
         # return xgb.train(param, dtrain, num_round, feval = map3eval)
-
-    # def train_row(self, i):
-    #     return map(lambda x: self.train_grid(i, x), range(self.grid.max_n + 1))
-
-    # def train(self):
-    #     pool = Pool(processes = 4)
-    #     m = self.grid.max_m + 1
-    #     n = self.grid.max_n + 1
-    #     result = pool.apply_async(self.train_row, range(m))
-    #     result.get()
-    #     pass
 
     def train_grid(self, m, n):
         """
@@ -331,7 +330,7 @@ class XGB_Model(SklearnModel):
         state['test_grid'] = test_grid_wise_data
         state['threshold'] = self.threshold
 
-        p = Pool(10)
+        p = Pool(8)
         row_results = p.map(StateLoader(state), range(self.grid.max_m + 1))
         print "Training time of parallel processing %s" %(time.time() - init_time)
         # row_results = map(StateLoader(state), range(self.grid.max_m - 1, self.grid.max_m + 1))
