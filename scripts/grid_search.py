@@ -108,6 +108,7 @@ print len(enc['encoder'].classes_)
 dtrain = xgb.DMatrix(X, label=np.ravel(y))
 dtest = xgb.DMatrix(test_X, label=np.ravel(test_y))
 
+
 tup = lambda t: list(itertools.izip(itertools.repeat(t[0]), t[1]))
 
 def get_list_of_params(params_range):
@@ -120,7 +121,7 @@ def grid_search_xgb(params_range_dict):
     grid_params_list = get_list_of_params(params_range_dict)
     p = Pool(4)
     maps = p.map(get_map_of_xgb, grid_params_list)
-    sorted_maps = sorted(maps, cmp = lambda x, y: cmp(x['map'], y['map']))
+    sorted_maps = sorted(maps, cmp = lambda x, y: cmp(x['map'], y['map']), reverse = True)
     print "top map results", sorted_maps[:3]
     return sorted_maps
 
@@ -138,10 +139,10 @@ def get_map_of_xgb(grid_param):
                      'scale_pos_weight': 1
                   }
     orig_params.update(grid_param)
+    # print orig_params, grid_param
     temp_cv = xgb.cv(orig_params, dtrain, num_boost_round = 100,
              early_stopping_rounds = 20, feval = map3eval, maximize = True)
     temp_map = temp_cv['test-MAP@3-mean'][temp_cv.shape[0]-1]
-    temp_map = np.random.random()
     grid_param['map'] = temp_map
     print "cv results", grid_param
     return grid_param
