@@ -159,16 +159,16 @@ def classifier(X, Y, y_transformer):
     param['objective'] = 'multi:softprob'
     # scale weight of positive examples
     param['eta'] = 0.1
-    param['max_depth'] = 10
+    param['max_depth'] = 13
     param['silent'] = 1
     param['nthread'] = 4
     param['num_class'] = len(y_transformer['encoder'].classes_)
-    param['min_child_weight'] = 6
-    param['gamma'] = 0
-    param['subsample'] = 0.8
-    param['colsample_bytree'] = 0.8
+    param['min_child_weight'] = 5
+    param['gamma'] = 0.3
+    param['subsample'] = 0.9
+    param['colsample_bytree'] = 0.7
     param['scale_pos_weight'] = 1
-    num_round = 30
+    num_round = 100
     dtrain = xgb.DMatrix(X, label=np.ravel(Y))
     return xgb.train(param, dtrain, num_round, feval = map3eval)
 
