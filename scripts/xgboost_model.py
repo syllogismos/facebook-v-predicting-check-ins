@@ -104,16 +104,16 @@ def predict_single_grid_cell(X, clf, x_transformer, y_transformer):
         if y < 20:
             temp_array = np.array([[5348440074]*(20-y)]*len(top_20_placeids))
             top_20_placeids = np.hstack((top_20_placeids, temp_array))
-    x, y = data.shape
-    if y == 6:
-        dump = np.hstack((data[:, (0, 5)], top_20_placeids))
-        # dump this crap to file
-        return dump[:, (0, 2, 3, 4)]
-    elif y == 5:
-        dump = np.hstack((data[:, 0].reshape(-1, 1), top_20_placeids))
-        # dump this to a file
-        return dump[:, (0, 1, 2, 3)]
-    # return np.hstack((data[:, 0].reshape(-1, 1), top_3_placeids))
+    # x, y = data.shape
+    # if y == 6:
+    #     dump = np.hstack((data[:, (0, 5)], top_20_placeids))
+    #     # dump this crap to file
+    #     return dump[:, (0, 2, 3, 4)]
+    # elif y == 5:
+    #     dump = np.hstack((data[:, 0].reshape(-1, 1), top_20_placeids))
+    #     # dump this to a file
+    #     return dump[:, (0, 1, 2, 3)]
+    return np.hstack((data[:, 0].reshape(-1, 1), top_20_placeids))
 
 def trans_x(X, x_transformer = None):
     """
@@ -359,10 +359,16 @@ class XGB_Model(SklearnModel):
         cv_preds = np.vstack(cv_rows).astype(int)
 
         sorted_test = test_preds[test_preds[:, 0].argsort()]
+        # TODO: Dump test results top 20 here
+        np.savetxt('test_top_20_' + submission_file, sorted_test,\
+            fmt = '%s', delimiter = ',')
         sorted_cv = cv_preds[cv_preds[:, 0].argsort()]
 
         actual_cv = cv_data[:, -1].astype(int).reshape(-1, 1)
         cv_a_p = np.hstack((sorted_cv, actual_cv))
+        np.savetxt('train_top_20_' + submission_file, cv_a_p,\
+            fmt = '%s', delimiter = ',')
+        # TODO: Dump train top 20 here
         apk_list = map(lambda row: apk(row[-1:], row[1:-1]), cv_a_p)
         self.cv_mean_precision = np.mean(apk_list)
         print "mean precision of cross validation set", str(self.cv_mean_precision)
@@ -373,7 +379,7 @@ class XGB_Model(SklearnModel):
         for i in range(len(sorted_test)):
             row = sorted_test[i]
             row_id = row[0]
-            row_prediction_string = ' '.join(row[1:])
+            row_prediction_string = ' '.join(row[1:4])
             submission.write(row_id + ',' + row_prediction_string + '\n')
             if i % 1000000 == 0:
                 print "generating %s row of test data" %(i)
