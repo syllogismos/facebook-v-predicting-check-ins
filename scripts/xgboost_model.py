@@ -94,17 +94,26 @@ def train_single_grid_cell(m, n, state):
 def predict_single_grid_cell(X, clf, x_transformer, y_transformer):
     data = np.array(X)
     if clf == None:
-        top_3_placeids = np.array([[5348440074, 9988088517, 4048573921]]*len(data))
+        top_20_placeids = np.array([[5348440074]*20]*len(data))
     else:
         temp_x = trans_x(data[:, (1, 2, 3, 4)], x_transformer)[0]
         dtest = xgb.DMatrix(temp_x)
         prediction_probs = clf.predict(dtest)
-        top_3_placeids = y_transformer['encoder'].inverse_transform(np.argsort(prediction_probs, axis = 1)[:, ::-1][:, :3])
-        x, y = top_3_placeids.shape
-        if y < 3:
-            temp_array = np.array([[5348440074]*(3-y)]*len(top_3_placeids))
-            top_3_placeids = np.hstack((top_3_placeids, temp_array))
-    return np.hstack((data[:, 0].reshape(-1, 1), top_3_placeids))
+        top_20_placeids = y_transformer['encoder'].inverse_transform(np.argsort(prediction_probs, axis = 1)[:, ::-1][:, :20])
+        x, y = top_20_placeids.shape
+        if y < 20:
+            temp_array = np.array([[5348440074]*(20-y)]*len(top_20_placeids))
+            top_20_placeids = np.hstack((top_20_placeids, temp_array))
+    x, y = data.shape
+    if y == 6:
+        dump = np.hstack((data[:, (0, 5)], top_20_placeids))
+        # dump this crap to file
+        return dump[:, (0, 2, 3, 4)]
+    elif y == 5:
+        dump = np.hstack((data[:, 0].reshape(-1, 1), top_20_placeids))
+        # dump this to a file
+        return dump[:, (0, 1, 2, 3)]
+    # return np.hstack((data[:, 0].reshape(-1, 1), top_3_placeids))
 
 def trans_x(X, x_transformer = None):
     """
