@@ -53,13 +53,13 @@ def train_row(i, state):
     for n in range(state['grid'].max_n + 1):
         if n % 10 == 0:
             print "processing column %s of row %s" %(n, i)
-        clf, x_transformer, y_transformer = train_single_grid_cell(i, n, state)
+        clf, x_transformer, y_transformer, top3 = train_single_grid_cell(i, n, state)
         if len(state['test_grid'][i][n]) > 0:
             test_preds.append(predict_single_grid_cell(state['test_grid'][i][n], \
-                clf, x_transformer, y_transformer))
+                clf, x_transformer, y_transformer, top3))
         if len(state['cv_grid'][i][n]) > 0:
             cv_preds.append(predict_single_grid_cell(state['cv_grid'][i][n], \
-                clf, x_transformer, y_transformer))
+                clf, x_transformer, y_transformer, top3))
         del(clf)
 
     if len(test_preds) > 0:
@@ -75,34 +75,42 @@ def train_row(i, state):
     return (test_row, cv_row)
 
 def train_single_grid_cell(m, n, state):
+    # print m, n
     data = np.loadtxt(state['grid'].getGridFile(m, n), dtype = float, delimiter = ',')
+    top3 = sorted(state['grid'].M[m][n].items(), cmp = lambda x, y: cmp(x[1], y[1]), reverse = True)[:3]
+    top3 = map(lambda x: x[0], top3)
+    y = len(top3)
+    if y < 3:
+	top3 += [5348440074]*(3-y)
     if len(data) == 0 or len(data.shape) == 1:
-        return None, None, None
+        return None, None, None, top3
     mask = np.array(map(lambda x: state['grid'].M[m][n][x] > state['threshold'], data[:, 5]))
     masked_data = data[mask, :]
     if len(masked_data) < 10:
-        return None, None, None
+        return None, None, None, top3
     X, x_transformer = trans_x(masked_data[:, (1, 2, 3, 4)])
     Y, y_transformer = trans_y(masked_data[:, 5])
 
     if len(Y) == 0:
-        return None, None, None
+        return None, None, None, top3
     else:
-        return classifier(X, Y, y_transformer), x_transformer, y_transformer
+        return classifier(X, Y, y_transformer), x_transformer, y_transformer, top3
     pass
 
-def predict_single_grid_cell(X, clf, x_transformer, y_transformer):
+def predict_single_grid_cell(X, clf, x_transformer, y_transformer, top3):
     data = np.array(X)
     if clf == None:
-        top_3_placeids = np.array([[5348440074, 9988088517, 4048573921]]*len(data))
+        top_3_placeids = np.array([top3]*len(data))
     else:
         temp_x = trans_x(data[:, (1, 2, 3, 4)], x_transformer)[0]
         dtest = xgb.DMatrix(temp_x)
         prediction_probs = clf.predict(dtest)
+        if len(prediction_probs.shape) == 1:
+            prediction_probs = prediction_probs.reshape(-1, 1)
         top_3_placeids = y_transformer['encoder'].inverse_transform(np.argsort(prediction_probs, axis = 1)[:, ::-1][:, :3])
         x, y = top_3_placeids.shape
         if y < 3:
-            temp_array = np.array([[5348440074]*(3-y)]*len(top_3_placeids))
+            temp_array = np.array([top3[:(3-y)]]*len(top_3_placeids))
             top_3_placeids = np.hstack((top_3_placeids, temp_array))
     return np.hstack((data[:, 0].reshape(-1, 1), top_3_placeids))
 
@@ -159,7 +167,7 @@ def classifier(X, Y, y_transformer):
     param['objective'] = 'multi:softprob'
     # scale weight of positive examples
     param['eta'] = 0.1
-    param['max_depth'] = 13
+    param['max_depth'] = 8
     param['silent'] = 1
     param['nthread'] = 4
     param['num_class'] = len(y_transformer['encoder'].classes_)
@@ -168,7 +176,7 @@ def classifier(X, Y, y_transformer):
     param['subsample'] = 0.9
     param['colsample_bytree'] = 0.7
     param['scale_pos_weight'] = 1
-    num_round = 100
+    num_round = 2
     dtrain = xgb.DMatrix(X, label=np.ravel(Y))
     return xgb.train(param, dtrain, num_round, feval = map3eval)
 
