@@ -45,6 +45,7 @@ state = {
     'test_grid': mxn matrix
     'threshold': 5
     'params_dict': xgb params for each grid
+    'prefix': for giggles, i mean to save files
 """
 def train_row(i, state):
     print "processing row %s" %(i)
@@ -85,7 +86,7 @@ def train_row(i, state):
 def train_single_grid_cell(m, n, state):
     # print m, n
     t = 10
-    top_t_prefix = 'top_t_preds'
+    top_t_prefix = state['prefix'][:-4]
     data = np.loadtxt(state['grid'].getGridFile(m, n), dtype = float, delimiter = ',')
     top_t = sorted(state['grid'].M[m][n].items(), cmp = lambda x, y: cmp(x[1], y[1]), reverse = True)[:t]
     top_t = map(lambda x: x[0], top_t)
@@ -99,7 +100,7 @@ def train_single_grid_cell(m, n, state):
     if len(masked_data) < 10:
         top_t_train_preds = np.hstack((data[:, 0].reshape(-1, 1), [top_t]*len(data)))
         top_t_train_preds = top_t_train_preds.astype(int)
-        file_name = state['grid'].getFolder() + '_'.join([top_t_prefix, str(m), str(n)]) + '.pickle'
+        file_name = state['grid'].getFolder() + '_'.join([top_t_prefix, str(m), str(n)]) + '.csv'
         np.savetxt(file_name, top_t_train_preds, fmt = '%s', delimiter = ',')
         return None, None, None, top_t, top_t_train_preds
     X, x_transformer = trans_x(masked_data[:, (1, 2, 3, 4)])
@@ -108,7 +109,7 @@ def train_single_grid_cell(m, n, state):
     if len(Y) == 0:
         top_t_train_preds = np.hstack((data[:, 0].reshape(-1, 1), [top_t]*len(data)))
         top_t_train_preds = top_t_train_preds.astype(int)
-        file_name = state['grid'].getFolder() + '_'.join([top_t_prefix, str(m), str(n)]) + '.pickle'
+        file_name = state['grid'].getFolder() + '_'.join([top_t_prefix, str(m), str(n)]) + '.csv'
         np.savetxt(file_name, top_t_train_preds, fmt = '%s', delimiter = ',')
         return None, None, None, top_t, top_t_train_preds
     else:
@@ -127,7 +128,7 @@ def train_single_grid_cell(m, n, state):
             top_t_train_preds= np.hstack((top_t_train_preds, temp_array))
         top_t_train_preds = np.hstack((data[:, 0].reshape(-1, 1), top_t_train_preds))
         top_t_train_preds = top_t_train_preds.astype(int)
-        file_name = state['grid'].getFolder() + '_'.join([top_t_prefix, str(m), str(n)]) + '.pickle'
+        file_name = state['grid'].getFolder() + '_'.join([top_t_prefix, str(m), str(n)]) + '.csv'
         np.savetxt(file_name, top_t_train_preds, fmt = '%s', delimiter = ',')
         return bst, x_transformer, y_transformer, top_t, top_t_train_preds
     pass
@@ -379,6 +380,8 @@ class XGB_Model(SklearnModel):
                                         for m in range(self.grid.max_m + 1)]
         else:
             state['params_dict'] = pickle.load(open(paramsFile, 'rb'))
+
+        state['prefix'] = os.path.basename(submission_file)
 
 
         p = Pool(4)
