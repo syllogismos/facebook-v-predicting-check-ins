@@ -86,7 +86,10 @@ def train_row(i, state):
 def train_single_grid_cell(m, n, state):
     # print m, n
     t = 10
-    top_t_prefix = state['prefix'][:-4]
+    top_t_prefix = state['prefix']
+    folder = state['grid'].getGridFile(m, n)[:-1] + top_t_prefix + '/'
+    if not os.path.exists(folder):
+        os.makedirs(folder)
     data = np.loadtxt(state['grid'].getGridFile(m, n), dtype = float, delimiter = ',')
     top_t = sorted(state['grid'].M[m][n].items(), cmp = lambda x, y: cmp(x[1], y[1]), reverse = True)[:t]
     top_t = map(lambda x: x[0], top_t)
@@ -100,7 +103,7 @@ def train_single_grid_cell(m, n, state):
     if len(masked_data) < 10:
         top_t_train_preds = np.hstack((data[:, 0].reshape(-1, 1), [top_t]*len(data)))
         top_t_train_preds = top_t_train_preds.astype(int)
-        file_name = state['grid'].getFolder() + '_'.join([top_t_prefix, str(m), str(n)]) + '.csv'
+        file_name = folder + '_'.join(['top_t_preds', str(m), str(n)]) + '.csv'
         np.savetxt(file_name, top_t_train_preds, fmt = '%s', delimiter = ',')
         return None, None, None, top_t, top_t_train_preds
     X, x_transformer = trans_x(masked_data[:, (1, 2, 3, 4)])
@@ -109,7 +112,7 @@ def train_single_grid_cell(m, n, state):
     if len(Y) == 0:
         top_t_train_preds = np.hstack((data[:, 0].reshape(-1, 1), [top_t]*len(data)))
         top_t_train_preds = top_t_train_preds.astype(int)
-        file_name = state['grid'].getFolder() + '_'.join([top_t_prefix, str(m), str(n)]) + '.csv'
+        file_name = folder + '_'.join(['top_t_preds', str(m), str(n)]) + '.csv'
         np.savetxt(file_name, top_t_train_preds, fmt = '%s', delimiter = ',')
         return None, None, None, top_t, top_t_train_preds
     else:
@@ -128,7 +131,7 @@ def train_single_grid_cell(m, n, state):
             top_t_train_preds= np.hstack((top_t_train_preds, temp_array))
         top_t_train_preds = np.hstack((data[:, 0].reshape(-1, 1), top_t_train_preds))
         top_t_train_preds = top_t_train_preds.astype(int)
-        file_name = state['grid'].getFolder() + '_'.join([top_t_prefix, str(m), str(n)]) + '.csv'
+        file_name = folder + '_'.join(['top_t_preds', str(m), str(n)]) + '.csv'
         np.savetxt(file_name, top_t_train_preds, fmt = '%s', delimiter = ',')
         return bst, x_transformer, y_transformer, top_t, top_t_train_preds
     pass
@@ -381,7 +384,7 @@ class XGB_Model(SklearnModel):
         else:
             state['params_dict'] = pickle.load(open(paramsFile, 'rb'))
 
-        state['prefix'] = os.path.basename(submission_file)
+        state['prefix'] = os.path.basename(submission_file)[:-4]
 
 
         p = Pool(4)
@@ -415,7 +418,7 @@ class XGB_Model(SklearnModel):
 
         sorted_test = test_preds[test_preds[:, 0].argsort()]
         print "saving top t test preds"
-        np.savetxt(submission_file + '_test_top_t' , sorted_test,\
+        np.savetxt(state['prefix'] + '_test_top_t' , sorted_test,\
             fmt = '%s', delimiter = ',')
 
         # sorted_train = train_preds[train_preds[:, 0].argsort()]
@@ -425,7 +428,7 @@ class XGB_Model(SklearnModel):
 
         sorted_cv = cv_preds[cv_preds[:, 0].argsort()]
         print "saving top t cv preds"
-        np.savetxt(submission_file + '_cv_top_t' , sorted_cv,\
+        np.savetxt(state['prefix'] + '_cv_top_t' , sorted_cv,\
             fmt = '%s', delimiter = ',')
 
         actual_cv = cv_data[:, -1].astype(int).reshape(-1, 1)
