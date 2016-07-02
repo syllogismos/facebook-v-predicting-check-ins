@@ -375,14 +375,15 @@ class XGB_Model(SklearnModel):
         default_xgb_params = {
             'objective': 'multi:softprob',
             'eta': 0.1,
-            'max_depth': 13,
-            'min_child_weight': 5,
-            'gamma': 0.3,
+            'max_depth': 3,
+            'min_child_weight': 6,
+            'gamma': 0.1,
             'subsample': 0.9,
-            'colsample_bytree': 0.7,
+            'colsample_bytree': 0.6,
             'scale_pos_weight': 1,
             'nthread': 4,
-            'silent': 1
+            'silent': 1,
+            'alpha': 0.005
         }
 
         paramsFile = self.grid.getParamsFile(5, 10)
@@ -394,7 +395,7 @@ class XGB_Model(SklearnModel):
             state['params_dict'] = pickle.load(open(paramsFile, 'rb'))
 
 
-        p = Pool(8)
+        p = Pool(4)
         row_results = p.map(StateLoader(state), range(self.grid.max_m + 1))
         print "Training time of parallel processing %s" %(time.time() - init_time)
         # row_results = map(StateLoader(state), range(self.grid.max_m - 1, self.grid.max_m + 1))
