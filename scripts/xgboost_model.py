@@ -418,7 +418,7 @@ class XGB_Model(SklearnModel):
 
         sorted_test = test_preds[test_preds[:, 0].argsort()]
         print "saving top t test preds"
-        np.savetxt(state['prefix'] + '_test_top_t' , sorted_test,\
+        np.savetxt(state['prefix'] + '_test_top_t.csv' , sorted_test,\
             fmt = '%s', delimiter = ',')
 
         # sorted_train = train_preds[train_preds[:, 0].argsort()]
@@ -428,7 +428,7 @@ class XGB_Model(SklearnModel):
 
         sorted_cv = cv_preds[cv_preds[:, 0].argsort()]
         print "saving top t cv preds"
-        np.savetxt(state['prefix'] + '_cv_top_t' , sorted_cv,\
+        np.savetxt(state['prefix'] + '_cv_top_t.csv' , sorted_cv,\
             fmt = '%s', delimiter = ',')
 
         actual_cv = cv_data[:, -1].astype(int).reshape(-1, 1)
