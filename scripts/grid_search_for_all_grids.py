@@ -229,7 +229,7 @@ if __name__ == '__main__':
 
             dtrain, enc = get_dtrain_enc(mt, nt)
 
-            for param_range in [param_range1]:#, param_range2, param_range3, param_range4]:
+            for param_range in [param_range1, param_range2, param_range3, param_range4]:
                 result = None
                 try:
                     result = grid_search_xgb(param_range)
