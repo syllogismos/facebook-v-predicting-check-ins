@@ -44,6 +44,7 @@ state = {
     'cv_grid': mxn matrix
     'test_grid': mxn matrix
     'threshold': 5
+    'params_dict': xgb params for each grid
 """
 def train_row(i, state):
     print "processing row %s" %(i)
@@ -94,7 +95,9 @@ def train_single_grid_cell(m, n, state):
     if len(Y) == 0:
         return None, None, None, top3
     else:
-        return classifier(X, Y, y_transformer), x_transformer, y_transformer, top3
+        params = dict(state['params_dict'][m][n])
+        params['num_class'] = len(y_transformer['encoder'].classes_)
+        return classifier(X, Y, params), x_transformer, y_transformer, top3
     pass
 
 def predict_single_grid_cell(X, clf, x_transformer, y_transformer, top3):
@@ -161,24 +164,24 @@ def trans_y(y, y_transformer = None):
     new_y = y_transformer['encoder'].transform(y).reshape(-1, 1)
     return (new_y, y_transformer)
 
-def classifier(X, Y, y_transformer):
-    param = {}
-    # use softmax multi-class classification
-    param['objective'] = 'multi:softprob'
-    # scale weight of positive examples
-    param['eta'] = 0.1
-    param['max_depth'] = 13
-    param['silent'] = 1
-    param['nthread'] = 4
-    param['num_class'] = len(y_transformer['encoder'].classes_)
-    param['min_child_weight'] = 5
-    param['gamma'] = 0.3
-    param['subsample'] = 0.9
-    param['colsample_bytree'] = 0.7
-    param['scale_pos_weight'] = 1
+def classifier(X, Y, params):
     num_round = 100
     dtrain = xgb.DMatrix(X, label=np.ravel(Y))
-    return xgb.train(param, dtrain, num_round, feval = map3eval)
+    return xgb.train(params, dtrain, num_round, feval = map3eval)
+    # param = dict(state['params_dict'][m][n])
+    # param['num_class'] = len(y_transformer['encoder'].classes_)
+    # use softmax multi-class classification
+    # param['objective'] = 'multi:softprob'
+    # # scale weight of positive examples
+    # param['eta'] = 0.1
+    # param['max_depth'] = 13
+    # param['silent'] = 1
+    # param['nthread'] = 4
+    # param['min_child_weight'] = 5
+    # param['gamma'] = 0.3
+    # param['subsample'] = 0.9
+    # param['colsample_bytree'] = 0.7
+    # param['scale_pos_weight'] = 1
 
 class XGB_Model(SklearnModel):
 
@@ -209,8 +212,8 @@ class XGB_Model(SklearnModel):
         # return (X_new, x_transformer)
 
 
-    def custom_classifier(self, X, Y, y_transformer):
-        classifier(X, Y, y_transformer)
+    def custom_classifier(self, X, Y, params):
+        classifier(X, Y, params)
         # param = {}
         # # use softmax multi-class classification
         # param['objective'] = 'multi:softprob'
@@ -252,7 +255,20 @@ class XGB_Model(SklearnModel):
             # if masked data is of length zero then also make model None
             self.model[m][n]['model'] = None
         else:
-            self.model[m][n]['model'] = self.custom_classifier(X, Y, y_transformer)
+            params = {
+                'objective': 'multi:softprob',
+                'eta': 0.1,
+                'max_depth': 13,
+                'min_child_weight': 5,
+                'gamma': 0.3,
+                'subsample': 0.9,
+                'colsample_bytree': 0.7,
+                'scale_pos_weight': 1,
+                'nthread': 4,
+                'silent': 1,
+                'num_class': len(y_transformer['encoder'].classes_)
+            }
+            self.model[m][n]['model'] = self.custom_classifier(X, Y, params)
         # return True
 
         # print "Time taken to train grid %s, %s is: %s" %(m, n, time.time() - init_time)
@@ -294,7 +310,21 @@ class XGB_Model(SklearnModel):
 
         test_X = self.transform_x(test[:, (1, 2, 3, 4)], x_transformer)[0]
 
-        trained_clf = self.custom_classifier(X, Y, y_transformer)
+        params = {
+            'objective': 'multi:softprob',
+            'eta': 0.1,
+            'max_depth': 13,
+            'min_child_weight': 5,
+            'gamma': 0.3,
+            'subsample': 0.9,
+            'colsample_bytree': 0.7,
+            'scale_pos_weight': 1,
+            'nthread': 4,
+            'silent': 1,
+            'num_class': len(y_transformer['encoder'].classes_)
+        }
+
+        trained_clf = self.custom_classifier(X, Y, params)
 
         print "Predicting the probablity of train set"
         cv_mean_precision_train = self.get_cv(trained_clf, masked_train, y_transformer)
@@ -341,6 +371,28 @@ class XGB_Model(SklearnModel):
         state['cv_grid'] = cv_grid_wise_data
         state['test_grid'] = test_grid_wise_data
         state['threshold'] = self.threshold
+
+        default_xgb_params = {
+            'objective': 'multi:softprob',
+            'eta': 0.1,
+            'max_depth': 13,
+            'min_child_weight': 5,
+            'gamma': 0.3,
+            'subsample': 0.9,
+            'colsample_bytree': 0.7,
+            'scale_pos_weight': 1,
+            'nthread': 4,
+            'silent': 1
+        }
+
+        paramsFile = self.grid.getParamsFile(5, 10)
+        if paramsFile == None:
+            print "params file doesn't exist.. so loading default params"
+            state['params_dict'] = [[default_xgb_params for n in range(self.grid.n + 1)]\
+                                        for m in range(self.grid.m + 1)]
+        else:
+            state['params_dict'] = pickle.load(open(paramsFile, 'rb'))
+
 
         p = Pool(8)
         row_results = p.map(StateLoader(state), range(self.grid.max_m + 1))
