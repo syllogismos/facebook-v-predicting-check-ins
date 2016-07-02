@@ -87,7 +87,7 @@ def train_single_grid_cell(m, n, state):
     # print m, n
     t = 10
     top_t_prefix = state['prefix']
-    folder = state['grid'].getGridFile(m, n)[:-1] + top_t_prefix + '/'
+    folder = state['grid'].getFolder()[:-1] + top_t_prefix + '/'
     if not os.path.exists(folder):
         os.makedirs(folder)
     data = np.loadtxt(state['grid'].getGridFile(m, n), dtype = float, delimiter = ',')
