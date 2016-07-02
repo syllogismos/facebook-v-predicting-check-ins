@@ -106,7 +106,7 @@ def train_single_grid_cell(m, n, state):
         params = dict(state['params_dict'][m][n])
         params['num_class'] = len(y_transformer['encoder'].classes_)
         bst = classifier(X, Y, params)
-        X_orig, x_transformer = trans_x(data[:, (1, 2, 3, 4), x_transformer)
+        X_orig, x_transformer = trans_x(data[:, (1, 2, 3, 4)], x_transformer)
         dtrain_orig = xgb.DMatrix(X_orig)
         train_preds_proba = bst.predict(dtrain_orig)
         if len(train_preds_proba.shape) == 1:
