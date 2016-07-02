@@ -82,7 +82,7 @@ def train_single_grid_cell(m, n, state):
     top3 = map(lambda x: x[0], top3)
     y = len(top3)
     if y < 3:
-    top3 += [5348440074]*(3-y)
+        top3 += [5348440074]*(3-y)
     if len(data) == 0 or len(data.shape) == 1:
         return None, None, None, top3
     mask = np.array(map(lambda x: state['grid'].M[m][n][x] > state['threshold'], data[:, 5]))
