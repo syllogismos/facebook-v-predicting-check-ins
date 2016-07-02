@@ -110,7 +110,7 @@ def train_single_grid_cell(m, n, state):
         dtrain_orig = xgb.DMatrix(X_orig)
         train_preds_proba = bst.predict(dtrain_orig)
         if len(train_preds_proba.shape) == 1:
-            train_preds = train_preds_proba.reshape(-1, 1)
+            train_preds_proba = train_preds_proba.reshape(-1, 1)
         top_t_train_preds = y_transformer['encoder'].inverse_transform(np.argsort(train_preds_proba, axis = 1)[:, ::-1][:, :t])
         x, y = top_t_train_preds.shape
         if y < t:
