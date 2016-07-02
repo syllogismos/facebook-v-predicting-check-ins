@@ -53,13 +53,13 @@ def train_row(i, state):
     for n in range(state['grid'].max_n + 1):
         if n % 10 == 0:
             print "processing column %s of row %s" %(n, i)
-        clf, x_transformer, y_transformer = train_single_grid_cell(i, n, state)
+        clf, x_transformer, y_transformer, top3 = train_single_grid_cell(i, n, state)
         if len(state['test_grid'][i][n]) > 0:
             test_preds.append(predict_single_grid_cell(state['test_grid'][i][n], \
-                clf, x_transformer, y_transformer))
+                clf, x_transformer, y_transformer, top3))
         if len(state['cv_grid'][i][n]) > 0:
             cv_preds.append(predict_single_grid_cell(state['cv_grid'][i][n], \
-                clf, x_transformer, y_transformer))
+                clf, x_transformer, y_transformer, top3))
         del(clf)
 
     if len(test_preds) > 0:
@@ -75,45 +75,44 @@ def train_row(i, state):
     return (test_row, cv_row)
 
 def train_single_grid_cell(m, n, state):
+    # print m, n
     data = np.loadtxt(state['grid'].getGridFile(m, n), dtype = float, delimiter = ',')
+    top3 = sorted(state['grid'].M[m][n].items(), cmp = lambda x, y: cmp(x[1], y[1]), reverse = True)[:3]
+    top3 = map(lambda x: x[0], top3)
+    y = len(top3)
+    if y < 3:
+    top3 += [5348440074]*(3-y)
     if len(data) == 0 or len(data.shape) == 1:
-        return None, None, None
+        return None, None, None, top3
     mask = np.array(map(lambda x: state['grid'].M[m][n][x] > state['threshold'], data[:, 5]))
     masked_data = data[mask, :]
     if len(masked_data) < 10:
-        return None, None, None
+        return None, None, None, top3
     X, x_transformer = trans_x(masked_data[:, (1, 2, 3, 4)])
     Y, y_transformer = trans_y(masked_data[:, 5])
 
     if len(Y) == 0:
-        return None, None, None
+        return None, None, None, top3
     else:
-        return classifier(X, Y, y_transformer), x_transformer, y_transformer
+        return classifier(X, Y, y_transformer), x_transformer, y_transformer, top3
     pass
 
-def predict_single_grid_cell(X, clf, x_transformer, y_transformer):
+def predict_single_grid_cell(X, clf, x_transformer, y_transformer, top3):
     data = np.array(X)
     if clf == None:
-        top_20_placeids = np.array([[5348440074]*20]*len(data))
+        top_3_placeids = np.array([top3]*len(data))
     else:
         temp_x = trans_x(data[:, (1, 2, 3, 4)], x_transformer)[0]
         dtest = xgb.DMatrix(temp_x)
         prediction_probs = clf.predict(dtest)
-        top_20_placeids = y_transformer['encoder'].inverse_transform(np.argsort(prediction_probs, axis = 1)[:, ::-1][:, :20])
-        x, y = top_20_placeids.shape
-        if y < 20:
-            temp_array = np.array([[5348440074]*(20-y)]*len(top_20_placeids))
-            top_20_placeids = np.hstack((top_20_placeids, temp_array))
-    # x, y = data.shape
-    # if y == 6:
-    #     dump = np.hstack((data[:, (0, 5)], top_20_placeids))
-    #     # dump this crap to file
-    #     return dump[:, (0, 2, 3, 4)]
-    # elif y == 5:
-    #     dump = np.hstack((data[:, 0].reshape(-1, 1), top_20_placeids))
-    #     # dump this to a file
-    #     return dump[:, (0, 1, 2, 3)]
-    return np.hstack((data[:, 0].reshape(-1, 1), top_20_placeids))
+        if len(prediction_probs.shape) == 1:
+            prediction_probs = prediction_probs.reshape(-1, 1)
+        top_3_placeids = y_transformer['encoder'].inverse_transform(np.argsort(prediction_probs, axis = 1)[:, ::-1][:, :3])
+        x, y = top_3_placeids.shape
+        if y < 3:
+            temp_array = np.array([top3[:(3-y)]]*len(top_3_placeids))
+            top_3_placeids = np.hstack((top_3_placeids, temp_array))
+    return np.hstack((data[:, 0].reshape(-1, 1), top_3_placeids))
 
 def trans_x(X, x_transformer = None):
     """
@@ -360,14 +359,14 @@ class XGB_Model(SklearnModel):
 
         sorted_test = test_preds[test_preds[:, 0].argsort()]
         # TODO: Dump test results top 20 here
-        np.savetxt('test_top_20_' + submission_file, sorted_test,\
-            fmt = '%s', delimiter = ',')
+        # np.savetxt(submission_file + '_test_top_20' , sorted_test,\
+        #     fmt = '%s', delimiter = ',')
         sorted_cv = cv_preds[cv_preds[:, 0].argsort()]
 
         actual_cv = cv_data[:, -1].astype(int).reshape(-1, 1)
         cv_a_p = np.hstack((sorted_cv, actual_cv))
-        np.savetxt('train_top_20_' + submission_file, cv_a_p,\
-            fmt = '%s', delimiter = ',')
+        # np.savetxt(submission_file + '_train_top_20' , cv_a_p,\
+        #     fmt = '%s', delimiter = ',')
         # TODO: Dump train top 20 here
         apk_list = map(lambda row: apk(row[-1:], row[1:-1]), cv_a_p)
         self.cv_mean_precision = np.mean(apk_list)
