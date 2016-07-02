@@ -96,12 +96,12 @@ def train_single_grid_cell(m, n, state):
     mask = np.array(map(lambda x: state['grid'].M[m][n][x] > state['threshold'], data[:, 5]))
     masked_data = data[mask, :]
     if len(masked_data) < 10:
-        return None, None, None, top_t, np.hstack(data[:, 0].reshape(-1, 1), [top_t]*len(data))
+        return None, None, None, top_t, np.hstack((data[:, 0].reshape(-1, 1), [top_t]*len(data)))
     X, x_transformer = trans_x(masked_data[:, (1, 2, 3, 4)])
     Y, y_transformer = trans_y(masked_data[:, 5])
 
     if len(Y) == 0:
-        return None, None, None, top_t, np.hstack(data[:, 0].reshape(-1, 1), [top_t]*len(data))
+        return None, None, None, top_t, np.hstack((data[:, 0].reshape(-1, 1), [top_t]*len(data)))
     else:
         params = dict(state['params_dict'][m][n])
         params['num_class'] = len(y_transformer['encoder'].classes_)
