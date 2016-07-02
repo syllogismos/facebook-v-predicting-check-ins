@@ -388,8 +388,8 @@ class XGB_Model(SklearnModel):
         paramsFile = self.grid.getParamsFile(5, 10)
         if paramsFile == None:
             print "params file doesn't exist.. so loading default params"
-            state['params_dict'] = [[default_xgb_params for n in range(self.grid.n + 1)]\
-                                        for m in range(self.grid.m + 1)]
+            state['params_dict'] = [[default_xgb_params for n in range(self.grid.max_n + 1)]\
+                                        for m in range(self.grid.max_m + 1)]
         else:
             state['params_dict'] = pickle.load(open(paramsFile, 'rb'))
 
