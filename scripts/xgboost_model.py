@@ -52,8 +52,8 @@ def train_row(i, state):
     test_preds = []
     cv_preds = []
     train_preds = []
-    # for n in range(state['grid'].max_n + 1):
-    for n in range(1):
+    for n in range(state['grid'].max_n + 1):
+    # for n in range(1):
         if n % 10 == 0:
             print "processing column %s of row %s" %(n, i)
         clf, x_transformer, y_transformer, top_t, top_t_train_places = train_single_grid_cell(i, n, state)
@@ -370,10 +370,10 @@ class XGB_Model(SklearnModel):
 
 
         p = Pool(4)
-        # row_results = p.map(StateLoader(state), range(self.grid.max_m + 1))
-        # print "Training time of parallel processing %s" %(time.time() - init_time)
-        row_results = map(StateLoader(state), range(1))
-        pdb.set_trace()
+        row_results = p.map(StateLoader(state), range(self.grid.max_m + 1))
+        print "Training time of parallel processing %s" %(time.time() - init_time)
+        # row_results = map(StateLoader(state), range(1))
+        # pdb.set_trace()
         test_rows = map(lambda x: x[0], row_results)
         cv_rows = map(lambda x: x[1], row_results)
         train_rows_preds = map(lambda x: x[2], row_results)
