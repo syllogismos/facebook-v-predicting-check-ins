@@ -45,7 +45,7 @@ state = {
     'test_grid': mxn matrix
     'threshold': 5
     'params_dict': xgb params for each grid
-    'prefix': for giggles, i mean to save files
+    'folder': for giggles, i mean to save files
 """
 def train_row(i, state):
     print "processing row %s" %(i)
@@ -86,10 +86,7 @@ def train_row(i, state):
 def train_single_grid_cell(m, n, state):
     # print m, n
     t = 10
-    top_t_prefix = state['prefix']
-    folder = state['grid'].getFolder()[:-1] + top_t_prefix + '/'
-    if not os.path.exists(folder):
-        os.makedirs(folder)
+    folder = state['folder']
     data = np.loadtxt(state['grid'].getGridFile(m, n), dtype = float, delimiter = ',')
     top_t = sorted(state['grid'].M[m][n].items(), cmp = lambda x, y: cmp(x[1], y[1]), reverse = True)[:t]
     top_t = map(lambda x: x[0], top_t)
@@ -384,8 +381,13 @@ class XGB_Model(SklearnModel):
         else:
             state['params_dict'] = pickle.load(open(paramsFile, 'rb'))
 
-        state['prefix'] = os.path.basename(submission_file)[:-4]
+        submission_name = os.path.basename(submission_file)[:-4]
 
+        folder = self.grid.getFolder()[:-1] + '_' + submission_name + '/'
+        if not os.path.exists(folder):
+            os.makedirs(folder)
+
+        state['folder'] = folder
 
         p = Pool(4)
         row_results = p.map(StateLoader(state), range(self.grid.max_m + 1))
@@ -418,7 +420,7 @@ class XGB_Model(SklearnModel):
 
         sorted_test = test_preds[test_preds[:, 0].argsort()]
         print "saving top t test preds"
-        np.savetxt(state['prefix'] + '_test_top_t.csv' , sorted_test,\
+        np.savetxt(folder + 'test_top_t.csv' , sorted_test,\
             fmt = '%s', delimiter = ',')
 
         # sorted_train = train_preds[train_preds[:, 0].argsort()]
@@ -428,7 +430,7 @@ class XGB_Model(SklearnModel):
 
         sorted_cv = cv_preds[cv_preds[:, 0].argsort()]
         print "saving top t cv preds"
-        np.savetxt(state['prefix'] + '_cv_top_t.csv' , sorted_cv,\
+        np.savetxt(folder + 'cv_top_t.csv' , sorted_cv,\
             fmt = '%s', delimiter = ',')
 
         actual_cv = cv_data[:, -1].astype(int).reshape(-1, 1)
