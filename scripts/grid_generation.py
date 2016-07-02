@@ -202,6 +202,16 @@ class Grid(object):
             + '.csv', c)
         return list(grid_files)
 
+    def getParamsFile(self, rx, ry):
+        rx = 'rx' + str(rx)
+        ry = 'ry' + str(ry)
+        paramsFile = self.getFolder() + '_'.join(['grid', str(self.X), str(self.Y), str(self.xd), str(self.yd),\
+            rx, ry, 'params_dict.pickle'])
+        if os.path.exists(paramsFile):
+            return paramsFile
+        else:
+            return None
+
     def getGridFile(self, m, n):
         return self.getFolder() + '_'.join(['grid_data', str(m), str(n)]) + '.csv'
 
