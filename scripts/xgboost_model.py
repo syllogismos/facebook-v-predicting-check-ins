@@ -96,7 +96,7 @@ def train_single_grid_cell(m, n, state):
     if len(data) == 0:
         return None, None, None, top_t, None
     if len(data.shape) == 1:
-        top_t_train_preds = np.array([data[:1] + top_t])
+        top_t_train_preds = np.hstack((data[:1], top_t))
         top_t_train_preds = top_t_train_preds.astype(int)
         file_name = folder + '_'.join(['top_t_preds', str(m), str(n)]) + '.csv'
         np.savetxt(file_name, top_t_train_preds, fmt = '%s', delimiter = ',')
