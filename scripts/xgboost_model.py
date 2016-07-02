@@ -385,7 +385,7 @@ class XGB_Model(SklearnModel):
         # pdb.set_trace()
         test_preds = np.vstack(test_rows).astype(int)
         cv_preds = np.vstack(cv_rows).astype(int)
-        train_preds = np.vstack(train_row_preds).astype(int)
+        train_preds = np.vstack(train_rows_preds).astype(int)
 
         print test_preds.shape, 'test preds shape'
         print cv_preds.shape, 'cv preds shape'
