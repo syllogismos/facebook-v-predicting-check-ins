@@ -110,7 +110,7 @@ def get_dtrain_enc(m, n):
 
 
 orig_params = {
-            'silent': 0,
+            'silent': 1,
             'nthread': 8,
             'eta': 0.1,
             'objective': 'multi:softprob',
@@ -206,7 +206,7 @@ if __name__ == '__main__':
     for Mt in range(M):
         for Nt in range(N):
             orig_params = {
-                'silent': 0,
+                'silent': 1,
                 'nthread': 8,
                 'eta': 0.1,
                 'objective': 'multi:softprob',
