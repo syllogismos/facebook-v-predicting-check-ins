@@ -93,8 +93,14 @@ def train_single_grid_cell(m, n, state):
     y = len(top_t)
     if y < t:
         top_t += [123]*(t-y) #[5348440074]*(t-y)
-    if len(data) == 0 or len(data.shape) == 1:
+    if len(data) == 0:
         return None, None, None, top_t, None
+    if len(data.shape) == 1:
+        top_t_train_preds = np.array([data[:1] + top_t])
+        top_t_train_preds = top_t_train_preds.astype(int)
+        file_name = folder + '_'.join(['top_t_preds', str(m), str(n)]) + '.csv'
+        np.savetxt(file_name, top_t_train_preds, fmt = '%s', delimiter = ',')
+        return None, None, None, top_t, top_t_train_preds
     mask = np.array(map(lambda x: state['grid'].M[m][n][x] > state['threshold'], data[:, 5]))
     masked_data = data[mask, :]
     if len(masked_data) < 10:
