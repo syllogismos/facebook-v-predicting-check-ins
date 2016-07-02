@@ -85,6 +85,7 @@ def train_row(i, state):
 def train_single_grid_cell(m, n, state):
     # print m, n
     t = 10
+    top_t_prefix = 'top_t_preds'
     data = np.loadtxt(state['grid'].getGridFile(m, n), dtype = float, delimiter = ',')
     top_t = sorted(state['grid'].M[m][n].items(), cmp = lambda x, y: cmp(x[1], y[1]), reverse = True)[:t]
     top_t = map(lambda x: x[0], top_t)
@@ -96,12 +97,20 @@ def train_single_grid_cell(m, n, state):
     mask = np.array(map(lambda x: state['grid'].M[m][n][x] > state['threshold'], data[:, 5]))
     masked_data = data[mask, :]
     if len(masked_data) < 10:
-        return None, None, None, top_t, np.hstack((data[:, 0].reshape(-1, 1), [top_t]*len(data)))
+        top_t_train_preds = np.hstack((data[:, 0].reshape(-1, 1), [top_t]*len(data)))
+        top_t_train_preds = top_t_train_preds.astype(int)
+        file_name = state['grid'].getFolder() + '_'.join([top_t_prefix, str(m), str(n)]) + '.pickle'
+        np.savetxt(file_name, top_t_train_preds, fmt = '%s', delimiter = ',')
+        return None, None, None, top_t, top_t_train_preds
     X, x_transformer = trans_x(masked_data[:, (1, 2, 3, 4)])
     Y, y_transformer = trans_y(masked_data[:, 5])
 
     if len(Y) == 0:
-        return None, None, None, top_t, np.hstack((data[:, 0].reshape(-1, 1), [top_t]*len(data)))
+        top_t_train_preds = np.hstack((data[:, 0].reshape(-1, 1), [top_t]*len(data)))
+        top_t_train_preds = top_t_train_preds.astype(int)
+        file_name = state['grid'].getFolder() + '_'.join([top_t_prefix, str(m), str(n)]) + '.pickle'
+        np.savetxt(file_name, top_t_train_preds, fmt = '%s', delimiter = ',')
+        return None, None, None, top_t, top_t_train_preds
     else:
         params = dict(state['params_dict'][m][n])
         params['num_class'] = len(y_transformer['encoder'].classes_)
@@ -117,6 +126,9 @@ def train_single_grid_cell(m, n, state):
             temp_array = [[123]*(t-y)]*x
             top_t_train_preds= np.hstack((top_t_train_preds, temp_array))
         top_t_train_preds = np.hstack((data[:, 0].reshape(-1, 1), top_t_train_preds))
+        top_t_train_preds = top_t_train_preds.astype(int)
+        file_name = state['grid'].getFolder() + '_'.join([top_t_prefix, str(m), str(n)]) + '.pickle'
+        np.savetxt(file_name, top_t_train_preds, fmt = '%s', delimiter = ',')
         return bst, x_transformer, y_transformer, top_t, top_t_train_preds
     pass
 
@@ -371,38 +383,42 @@ class XGB_Model(SklearnModel):
 
         p = Pool(4)
         row_results = p.map(StateLoader(state), range(self.grid.max_m + 1))
+        p.close()
+        p.join()
+        del(test_grid_wise_data)
+        del(cv_grid_wise_data)
         print "Training time of parallel processing %s" %(time.time() - init_time)
         # row_results = map(StateLoader(state), range(1))
         # pdb.set_trace()
         test_rows = map(lambda x: x[0], row_results)
         cv_rows = map(lambda x: x[1], row_results)
-        train_rows_preds = map(lambda x: x[2], row_results)
+        # train_rows_preds = map(lambda x: x[2], row_results)
 
         test_rows = filter(lambda x: x != None, test_rows)
         cv_rows = filter(lambda x: x != None, cv_rows)
-        train_rows_preds = filter(lambda x: x != None, train_rows_preds)
+        # train_rows_preds = filter(lambda x: x != None, train_rows_preds)
 
         # pdb.set_trace()
         test_preds = np.vstack(test_rows).astype(int)
         cv_preds = np.vstack(cv_rows).astype(int)
-        train_preds = np.vstack(train_rows_preds).astype(int)
+        # train_preds = np.vstack(train_rows_preds).astype(int)
 
         print test_preds.shape, 'test preds shape'
         print cv_preds.shape, 'cv preds shape'
-        print train_preds.shape, 'train preds shape'
+        # print train_preds.shape, 'train preds shape'
         print test_preds[0], 'first row of test preds'
         print cv_preds[0], 'first row of cv preds'
-        print train_preds[0], 'first row of train preds'
+        # print train_preds[0], 'first row of train preds'
 
         sorted_test = test_preds[test_preds[:, 0].argsort()]
         print "saving top t test preds"
         np.savetxt(submission_file + '_test_top_t' , sorted_test,\
             fmt = '%s', delimiter = ',')
 
-        sorted_train = train_preds[train_preds[:, 0].argsort()]
-        print "saving top t train preds"
-        np.savetxt(submission_file + '_train_top_t', sorted_train,\
-           fmt = '%s', delimiter = ',')
+        # sorted_train = train_preds[train_preds[:, 0].argsort()]
+        # print "saving top t train preds"
+        # np.savetxt(submission_file + '_train_top_t', sorted_train,\
+        #    fmt = '%s', delimiter = ',')
 
         sorted_cv = cv_preds[cv_preds[:, 0].argsort()]
         print "saving top t cv preds"
