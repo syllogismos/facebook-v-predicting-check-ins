@@ -134,7 +134,7 @@ def predict_single_grid_cell(X, clf, x_transformer, y_transformer, top_t):
         top_t_placeids = y_transformer['encoder'].inverse_transform(np.argsort(prediction_probs, axis = 1)[:, ::-1][:, :t])
         x, y = top_t_placeids.shape
         if y < t:
-            temp_array = np.array([top_t[:(3-y)]]*len(top_t_placeids))
+            temp_array = np.array([top_t[:(t-y)]]*len(top_t_placeids))
             top_t_placeids = np.hstack((top_t_placeids, temp_array))
     return np.hstack((data[:, 0].reshape(-1, 1), top_t_placeids))
 
@@ -395,20 +395,22 @@ class XGB_Model(SklearnModel):
         print train_preds[0], 'first row of train preds'
 
         sorted_test = test_preds[test_preds[:, 0].argsort()]
-        # TODO: Dump test results top t here
-        # np.savetxt(submission_file + '_test_top_t' , sorted_test,\
-        #     fmt = '%s', delimiter = ',')
-        sorted_cv = cv_preds[cv_preds[:, 0].argsort()]
+        print "saving top t test preds"
+        np.savetxt(submission_file + '_test_top_t' , sorted_test,\
+            fmt = '%s', delimiter = ',')
 
         sorted_train = train_preds[train_preds[:, 0].argsort()]
-        # np.savetxt(submission_file + '_train_top_t', sorted_train,\
-        #    fmt = '%s', delimiter = ',')
+        print "saving top t train preds"
+        np.savetxt(submission_file + '_train_top_t', sorted_train,\
+           fmt = '%s', delimiter = ',')
+
+        sorted_cv = cv_preds[cv_preds[:, 0].argsort()]
+        print "saving top t cv preds"
+        np.savetxt(submission_file + '_cv_top_t' , sorted_cv,\
+            fmt = '%s', delimiter = ',')
 
         actual_cv = cv_data[:, -1].astype(int).reshape(-1, 1)
         cv_a_p = np.hstack((sorted_cv, actual_cv))
-        # np.savetxt(submission_file + '_train_top_20' , cv_a_p,\
-        #     fmt = '%s', delimiter = ',')
-        # TODO: Dump train top 20 here
         apk_list = map(lambda row: apk(row[-1:], row[1:4]), cv_a_p)
         self.cv_mean_precision = np.mean(apk_list)
         print "mean precision of cross validation set", str(self.cv_mean_precision)
