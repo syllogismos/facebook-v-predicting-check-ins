@@ -116,7 +116,7 @@ def train_single_grid_cell(m, n, state):
         if y < t:
             temp_array = [[123]*(t-y)]*x
             top_t_train_preds= np.hstack((top_t_train_preds, temp_array))
-            top_t_train_preds = np.hstack((data[:, 0].reshape(-1, 1), top_t_train_preds))
+        top_t_train_preds = np.hstack((data[:, 0].reshape(-1, 1), top_t_train_preds))
         return bst, x_transformer, y_transformer, top_t, top_t_train_preds
     pass
 
