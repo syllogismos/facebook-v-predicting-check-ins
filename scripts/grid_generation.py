@@ -200,7 +200,7 @@ class Grid(object):
         return self.getFolder()[:-1] + '_' + submission_name + '/'
 
     def getFeaturesFolder(self, submission_name):
-        return self.getFolder()[:-1] + '_'.join([submission_name, features]) + '/'
+        return self.getFolder()[:-1] + '_'.join([submission_name, 'features']) + '/'
 
     def getGirdFiles(self):
         c = itertools.product(range(self.max_m + 1), range(self.max_ni + 1))
