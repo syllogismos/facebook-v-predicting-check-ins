@@ -4,6 +4,7 @@ import grid_generation as grid
 from nearest_distance_from_mean_place_ids import build_stat_xy_matrix, build_time_matrix
 import numpy as np
 import os
+from tqdm import tqdm
 
 g = grid.Grid(200, 50, 20, 5, pref = 'grid')
 
@@ -74,6 +75,14 @@ def generate_features(grid, submission_name):
         for n in range(1):
             generate_feature_in_grid(grid, submission_name, m, n)
 
+class GridLoader(object):
+    def __init__(self, grid, submission_name):
+        self.grid = grid
+        self.submission_name = submission_name
+
+    def __call__(self, grid_id):
+        generate_feature_in_grid(self.grid, self.submission_name, grid_id[0], grid_id[1])
+
 def generate_feature_in_grid(grid, submission_name, m, n):
     """
     """
@@ -84,7 +93,7 @@ def generate_feature_in_grid(grid, submission_name, m, n):
     top_t_dict = get_stat_dict(top_t_data)
 
     features = {}
-    for i in data_dict.keys():
+    for i in tqdm(data_dict.keys()):
         if i in top_t_dict:
             features[i] = get_features_from_ids(data_dict[i], top_t_dict[i])
         else:
@@ -121,7 +130,7 @@ def generate_feature(orig_file, top_t_file, feature_file):
     top_t_dict = get_stat_dict(top_t_data)
 
     features = {}
-    for i in data_dict.keys():
+    for i in tqdm(data_dict.keys()):
         if i in top_t_dict:
             features[i] = get_features_from_ids(data_dict[i], top_t_dict[i])
         else:
