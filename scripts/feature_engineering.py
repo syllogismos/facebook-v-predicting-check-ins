@@ -7,6 +7,7 @@ import os
 from tqdm import tqdm
 import itertools
 from multiprocessing import Pool
+from base_scikit_learn_model import get_grids_of_a_point
 
 g = grid.Grid(200, 50, 20, 5, pref = 'grid')
 
@@ -98,10 +99,38 @@ fmt = ['%.0f',\
     '%.1f', '%.0f', '%.0f', '%.0f', '%.0f', '%.0f', '%.0f', '%.0f', '%.0f', '%.2f', '%.4f', '%.4f', '%.4f',\
     '%.1f', '%.0f', '%.0f', '%.0f', '%.0f', '%.0f', '%.0f', '%.0f', '%.0f', '%.2f', '%.4f', '%.4f', '%.4f']
 
+def generate_test_feature_files(grid, submission_name):
+    test_feature_prefix = grid.getFeaturesFolder(submission_name) + 'test_feature'
+    test_features = np.loadtxt(test_feature_prefix + '.csv', delimiter = ',')
+
+    test_data = np.loadtxt('../test.csv', dtype = float, delimiter = ',')
+    test_feature_data = np.loadtxt(grid.getFeaturesFolder(submission_name) + \
+        'test_feature.csv', delimiter = ',')
+    test_combined = np.hstack((test_data, test_feature_data[:, 1:]))
+    del(test_data)
+    del(test_feature_data)
+
+    test_grid_wise_data = [[[] for n in range(grid.max_n + 1)]\
+            for m in range(grid.max_m + 1)]
+
+
+    print "converting test data to grid wise"
+    for i in tqdm(range(len(test_combined))):
+        m, n = get_grids_of_a_point((test_combined[i][1], test_combined[i][2]), grid)[0]
+        test_grid_wise_data[m][n].append(test_combined[i])
+
+    for m in range(grid.max_m + 1):
+        for n in range(grid.max_n + 1):
+            np.savetxt('_'.join([test_feature_prefix, str(m), str(n)]) + '.csv', \
+                np.array(test_grid_wise_data[m][n], delimiter = ',', \
+                fmt = ['%.0f', '%.5f', '%.5f', '%.0f', '%.0f'] + fmt[1:])
+
 def generate_feature_in_grid(grid, submission_name, m, n):
     """
     """
     data = load_data_from_grid(m, n)
+    if len(data) == 0:
+        return
     try:
         top_t_data = np.loadtxt(get_top_places_file(g, m, n, submission_name), delimiter = ',', dtype = int)
     except IOError:
@@ -127,7 +156,7 @@ def generate_grid_features(grid, submission_name):
     m = range(grid.max_m + 1)
     n = range(grid.max_n + 1)
     grid_ids = itertools.product(m, n)
-    p = Pool(8)
+    p = Pool(16)
     result = p.map(GridLoader(grid, submission_name), grid_ids)
     p.close()
     p.join()

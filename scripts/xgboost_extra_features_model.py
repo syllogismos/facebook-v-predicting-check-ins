@@ -62,10 +62,11 @@ def train_row(i, state):
             train_preds.append(top_t_train_places)
         if len(state['test_grid'][i][n]) > 0:
             test_preds.append(predict_single_grid_cell(state['test_grid'][i][n], \
-                clf, x_transformer, y_transformer, top_t))
+                clf, x_transformer, y_transformer, top_t, i, n, test = True, \
+                ff = state['grid'].getFeaturesFolder(state['feature_submission_name'])))
         if len(state['cv_grid'][i][n]) > 0:
             cv_preds.append(predict_single_grid_cell(state['cv_grid'][i][n], \
-                clf, x_transformer, y_transformer, top_t))
+                clf, x_transformer, y_transformer, top_t, i, n))
         del(clf)
 
     if len(test_preds) > 0:
@@ -154,9 +155,14 @@ def train_single_grid_cell(m, n, state):
         return bst, x_transformer, y_transformer, top_t, top_t_train_preds
     pass
 
-def predict_single_grid_cell(X, clf, x_transformer, y_transformer, top_t):
+def predict_single_grid_cell(X, clf, x_transformer, y_transformer, top_t, m, n, test = False, ff = None):
     t = 10
-    data = np.array(X)
+
+    if test:
+        data = np.loadtxt(ff + '_'.join(['test_feature', str(m), str(n)] + '.csv', delimiter = ',')
+    else:
+        data = np.array(X)
+
     if clf == None:
         top_t_placeids = np.array([top_t]*len(data))
     else:
@@ -367,22 +373,22 @@ class XGB_Model(SklearnModel):
         del(cv_data)
         del(cv_feature_data)
 
-        test_data = np.loadtxt(self.test_file, dtype = float, delimiter = ',')
-        test_feature_data = np.loadtxt(self.grid.getFeaturesFolder(feature_submission_name) + \
-            'test_feature.csv', delimiter = ',')
-        test_combined = np.hstack((test_data, test_feature_data[:, 1:]))
-        del(test_data)
-        del(test_feature_data)
+        # test_data = np.loadtxt(self.test_file, dtype = float, delimiter = ',')
+        # test_feature_data = np.loadtxt(self.grid.getFeaturesFolder(feature_submission_name) + \
+        #     'test_feature.csv', delimiter = ',')
+        # test_combined = np.hstack((test_data, test_feature_data[:, 1:]))
+        # del(test_data)
+        # del(test_feature_data)
 
         test_grid_wise_data = [[[] for n in range(self.grid.max_n + 1)]\
             for m in range(self.grid.max_m + 1)]
         cv_grid_wise_data = [[[] for n in range(self.grid.max_n + 1)]\
             for m in range(self.grid.max_m + 1)]
 
-        print "converting test data to grid wise"
-        for i in range(len(test_combined)):
-            m, n = get_grids_of_a_point((test_combined[i][1], test_combined[i][2]), self.grid)[0]
-            test_grid_wise_data[m][n].append(test_combined[i])
+        # print "converting test data to grid wise"
+        # for i in range(len(test_combined)):
+        #     m, n = get_grids_of_a_point((test_combined[i][1], test_combined[i][2]), self.grid)[0]
+        #     test_grid_wise_data[m][n].append(test_combined[i])
 
         print "converting cv data to grid wise"
         for i in range(len(cv_combined)):
