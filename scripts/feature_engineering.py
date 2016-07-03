@@ -5,6 +5,8 @@ from nearest_distance_from_mean_place_ids import build_stat_xy_matrix, build_tim
 import numpy as np
 import os
 from tqdm import tqdm
+import itertools
+from multiprocessing import Pool
 
 g = grid.Grid(200, 50, 20, 5, pref = 'grid')
 
@@ -93,7 +95,7 @@ def generate_feature_in_grid(grid, submission_name, m, n):
     top_t_dict = get_stat_dict(top_t_data)
 
     features = {}
-    for i in tqdm(data_dict.keys()):
+    for i in data_dict.keys():
         if i in top_t_dict:
             features[i] = get_features_from_ids(data_dict[i], top_t_dict[i])
         else:
@@ -103,6 +105,15 @@ def generate_feature_in_grid(grid, submission_name, m, n):
     feature_data = np.array(map(lambda row: np.hstack(([row[0]], row[1])), feature_items))
     file_name = grid.getFeaturesFolder(submission_name) + '_'.join(['feature', str(m), str(n)]) + '.csv'
     np.savetxt(file_name, feature_data, delimiter = ',')
+
+def generate_grid_features(grid, submission_name):
+    m = range(grid.max_m + 1)
+    n = range(grid.max_n + 1)
+    grid_ids = itertools.product(m, n)
+    p = Pool(8)
+    result = p.map(GridLoader(grid, submission_name), grid_ids)
+    p.close()
+    p.join()
 
 def generate_test_feature(grid, submission_name):
     folder = grid.getFeaturesFolder(submission_name)
