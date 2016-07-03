@@ -158,7 +158,7 @@ def train_single_grid_cell(m, n, state):
 def predict_single_grid_cell(X, clf, x_transformer, y_transformer, top_t, m, n, test = False, ff = None):
     t = 10
     data = np.array(X)
-    if test = True:
+    if test == True:
         if len(data) != 0:
             test_features = np.loadtxt(ff + '_'.join(['test_feature', str(m), str(n)] + '.csv', delimiter = ',')
             if len(data.shape) == 1:
