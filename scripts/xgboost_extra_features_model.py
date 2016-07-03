@@ -157,11 +157,14 @@ def train_single_grid_cell(m, n, state):
 
 def predict_single_grid_cell(X, clf, x_transformer, y_transformer, top_t, m, n, test = False, ff = None):
     t = 10
-
-    if test:
-        data = np.loadtxt(ff + '_'.join(['test_feature', str(m), str(n)] + '.csv', delimiter = ',')
-    else:
-        data = np.array(X)
+    data = np.array(X)
+    if test = True:
+        if len(data) != 0:
+            test_features = np.loadtxt(ff + '_'.join(['test_feature', str(m), str(n)] + '.csv', delimiter = ',')
+            if len(data.shape) == 1:
+                data = data.reshape(1, len(data))
+                test_features = test_features.reshape(1, len(data))
+            data = np.hstack((data, test_features[:, 1:]))
 
     if clf == None:
         top_t_placeids = np.array([top_t]*len(data))
@@ -373,7 +376,7 @@ class XGB_Model(SklearnModel):
         del(cv_data)
         del(cv_feature_data)
 
-        # test_data = np.loadtxt(self.test_file, dtype = float, delimiter = ',')
+        test_data = np.loadtxt(self.test_file, dtype = float, delimiter = ',')
         # test_feature_data = np.loadtxt(self.grid.getFeaturesFolder(feature_submission_name) + \
         #     'test_feature.csv', delimiter = ',')
         # test_combined = np.hstack((test_data, test_feature_data[:, 1:]))
@@ -385,10 +388,10 @@ class XGB_Model(SklearnModel):
         cv_grid_wise_data = [[[] for n in range(self.grid.max_n + 1)]\
             for m in range(self.grid.max_m + 1)]
 
-        # print "converting test data to grid wise"
-        # for i in range(len(test_combined)):
-        #     m, n = get_grids_of_a_point((test_combined[i][1], test_combined[i][2]), self.grid)[0]
-        #     test_grid_wise_data[m][n].append(test_combined[i])
+        print "converting test data to grid wise"
+        for i in range(len(test_data)):
+            m, n = get_grids_of_a_point((test_data[i][1], test_data[i][2]), self.grid)[0]
+            test_grid_wise_data[m][n].append(test_data[i])
 
         print "converting cv data to grid wise"
         for i in range(len(cv_combined)):

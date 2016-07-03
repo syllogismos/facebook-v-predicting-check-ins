@@ -8,6 +8,7 @@ from tqdm import tqdm
 import itertools
 from multiprocessing import Pool
 from base_scikit_learn_model import get_grids_of_a_point
+import csv
 
 g = grid.Grid(200, 50, 20, 5, pref = 'grid')
 
@@ -124,6 +125,34 @@ def generate_test_feature_files(grid, submission_name):
             np.savetxt('_'.join([test_feature_prefix, str(m), str(n)]) + '.csv', \
                 np.array(test_grid_wise_data[m][n]), delimiter = ',', \
                 fmt = ['%.0f', '%.5f', '%.5f', '%.0f', '%.0f'] + fmt[1:])
+
+def generate_test_feature_files(grid, submission_name):
+    test_feature_prefix = grid.getFeaturesFolder(submission_name) + 'test_feature'
+    test_data = open('../test.csv', 'rb')
+    test_data_csv = csv.reader(test_data)
+
+    test_feature_data = open(test_feature_prefix + '.csv', 'rb')
+    test_feature_csv = csv.reader(test_feature_data)
+
+    file_handles = [[open('_'.join([test_feature_prefix, str(m), str(n)]), 'wb')\
+                for m in range(grid.max_m + 1)]\
+                for n in range(grid.max_n + 1)]
+
+    progress = 0
+    while True:
+        try:
+            a = test_data_csv.next()
+            b = test_feature_csv.next()
+            line = ','.join(b) + '\n'
+            c = (float(a[1]), float(a[2]))
+            m, n = get_grids_of_a_point(c, grid)[0]
+            progress += 1
+            file_handles[m][n].write(line)
+            if progress % 1000000 == 0:
+                print 'parsing line %s' %(progress)
+
+    temp = [map(lambda file_handle: file_handle.close(), row) for row in file_handles]
+
 
 def generate_feature_in_grid(grid, submission_name, m, n):
     """
