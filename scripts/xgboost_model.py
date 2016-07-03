@@ -205,7 +205,7 @@ def trans_y(y, y_transformer = None):
     return (new_y, y_transformer)
 
 def classifier(X, Y, params):
-    num_round = 100
+    num_round = 200
     dtrain = xgb.DMatrix(X, label=np.ravel(Y))
     bst = xgb.train(params, dtrain, num_round, feval = map3eval)
     return bst
@@ -376,7 +376,6 @@ class XGB_Model(SklearnModel):
             'scale_pos_weight': 1,
             'nthread': 4,
             'silent': 1,
-            'alpha': 0.005
         }
 
         paramsFile = self.grid.getParamsFile(5, 10)

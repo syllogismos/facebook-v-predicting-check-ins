@@ -30,4 +30,4 @@ def test_compute_mode():
 
 
 if __name__ == '__main__':
-    compute_modes()
+    compute_time()
