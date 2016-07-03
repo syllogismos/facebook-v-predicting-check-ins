@@ -214,8 +214,7 @@ class Grid(object):
     def getParamsFile(self, rx, ry):
         rx = 'rx' + str(rx)
         ry = 'ry' + str(ry)
-        paramsFile = self.getFolder() + '_'.join(['grid', str(self.X), str(self.Y), str(self.xd), str(self.yd),\
-            rx, ry, 'params_dict.pickle'])
+        paramsFile = self.getFolder() + '_'.join([rx, ry, 'params_dict.pickle'])
         if os.path.exists(paramsFile):
             return paramsFile
         else:
