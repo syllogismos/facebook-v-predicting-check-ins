@@ -3,6 +3,7 @@
 import grid_generation as grid
 from nearest_distance_from_mean_place_ids import build_stat_xy_matrix, build_time_matrix
 import numpy as np
+import os
 
 g = grid.Grid(200, 50, 20, 5, pref = 'grid')
 
