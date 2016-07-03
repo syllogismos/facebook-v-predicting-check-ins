@@ -196,11 +196,27 @@ class Grid(object):
     def getFolder(self):
         return '../' + '_'.join([self.pref, str(self.X), str(self.Y), str(self.xd), str(self.yd)]) + '/'
 
+    def getTopPlacesFolder(self, submission_name):
+        return self.getFolder()[:-1] + '_' + submission_name + '/'
+
+    def getFeaturesFolder(self, submission_name):
+        return '_'.join([self.getFolder()[:-1], submission_name, 'features']) + '/'
+
     def getGirdFiles(self):
         c = itertools.product(range(self.max_m + 1), range(self.max_ni + 1))
         grid_files = map(lambda x: self.getFolder() + '_'.join(['grid_data', str(x[0]), str(x[1])])\
             + '.csv', c)
         return list(grid_files)
+
+    def getParamsFile(self, rx, ry):
+        rx = 'rx' + str(rx)
+        ry = 'ry' + str(ry)
+        paramsFile = self.getFolder() + '_'.join(['grid', str(self.X), str(self.Y), str(self.xd), str(self.yd),\
+            rx, ry, 'params_dict.pickle'])
+        if os.path.exists(paramsFile):
+            return paramsFile
+        else:
+            return None
 
     def getGridFile(self, m, n):
         return self.getFolder() + '_'.join(['grid_data', str(m), str(n)]) + '.csv'

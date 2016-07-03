@@ -7,6 +7,7 @@ from tqdm import tqdm
 from scipy import stats
 import zipfile, zlib, boto, boto.s3, sys, aws_config, os
 from boto.s3.key import Key
+import pdb
 
 start_date = datetime.datetime(2016, 5, 1)
 
@@ -154,6 +155,51 @@ def load_data(file_name):
                fcsv)
     return np.array(data)
 
+def load_pure_data(file_name):
+    f = open(file_name, 'rb')
+    fcsv = csv.reader(f)
+    data = map(lambda x: [float(x[1]),
+                          float(x[2]),
+                          int(x[3]),
+                          int(x[4]),
+                          int(x[5])
+                         ],
+               fcsv)
+    return np.array(data)
+
+def compute_place_wise_time_stats(file_name, output_file_name):
+    """
+    """
+    data = load_pure_data(file_name)
+    # sorted_data = data[data[:, 4].argsort()]
+    place_ids = np.unique(data[:, 4])
+    place_wise_data = np.zeros((len(place_ids), 9)) # hour, hour_2, hour_3, hour_4, hour_6, hour_8, weekday, month
+    for i, place_id in tqdm(enumerate(place_ids)):
+        temp_data_set = data[data[:, 4] == place_id]
+        t = temp_data_set[:, 3]
+        minute_v = t%60
+        hour_v = t//60
+        weekday_v = hour_v//24
+        month_v = weekday_v//30
+        year_v = np.median((weekday_v//365 + 1))
+        hour_v = np.median(((hour_v%24 + 1) + minute_v/60.0))
+        hour_v_2 = np.median((t%(60*60*24))//(60*60*2))
+        hour_v_3 = np.median((t%(60*60*24))//(60*60*3))
+        hour_v_4 = np.median((t%(60*60*24))//(60*60*4))
+        hour_v_6 = np.median((t%(60*60*24))//(60*60*6))
+        hour_v_8 = np.median((t%(60*60*24))//(60*60*8))
+        weekday_v = np.median((weekday_v%7 + 1))
+        month_v = np.median((month_v%12 + 1))
+        time_stats = [place_id, hour_v, hour_v_2, hour_v_3, hour_v_4, hour_v_6, hour_v_8,\
+                weekday_v, month_v]
+        place_wise_data[i] = time_stats
+
+    print "Saving File"
+    np.savetxt(output_file_name, place_wise_data, delimiter = ',', \
+        fmt = ['%.0f', '%.1f', '%.0f', \
+        '%.0f', '%.0f', '%.0f', \
+        '%.0f', '%.0f', '%.0f'],
+        header = 'place_id, hour_v, hour_v_2, hour_v_3, hour_v_4, hour_v_6, hour_v_8, weekday_v, month_v')
 
 def compute_place_wise_stats(file_name, output_file_name):
     """

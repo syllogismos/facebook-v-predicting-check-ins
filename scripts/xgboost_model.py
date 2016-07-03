@@ -44,22 +44,28 @@ state = {
     'cv_grid': mxn matrix
     'test_grid': mxn matrix
     'threshold': 5
+    'params_dict': xgb params for each grid
+    'folder': for giggles, i mean to save files
 """
 def train_row(i, state):
     print "processing row %s" %(i)
     init_row_time = time.time()
     test_preds = []
     cv_preds = []
+    train_preds = []
     for n in range(state['grid'].max_n + 1):
+    # for n in range(1):
         if n % 10 == 0:
             print "processing column %s of row %s" %(n, i)
-        clf, x_transformer, y_transformer, top3 = train_single_grid_cell(i, n, state)
+        clf, x_transformer, y_transformer, top_t, top_t_train_places = train_single_grid_cell(i, n, state)
+        if top_t_train_places != None:
+            train_preds.append(top_t_train_places)
         if len(state['test_grid'][i][n]) > 0:
             test_preds.append(predict_single_grid_cell(state['test_grid'][i][n], \
-                clf, x_transformer, y_transformer, top3))
+                clf, x_transformer, y_transformer, top_t))
         if len(state['cv_grid'][i][n]) > 0:
             cv_preds.append(predict_single_grid_cell(state['cv_grid'][i][n], \
-                clf, x_transformer, y_transformer, top3))
+                clf, x_transformer, y_transformer, top_t))
         del(clf)
 
     if len(test_preds) > 0:
@@ -70,49 +76,86 @@ def train_row(i, state):
         cv_row = np.vstack(cv_preds)
     else:
         cv_row = None
-
+    if len(train_preds) > 0:
+        train_row_preds = np.vstack(train_preds)
+    else:
+        train_row_preds = None
     print "time taken for row %s is %s" %(i, time.time() - init_row_time)
-    return (test_row, cv_row)
+    return (test_row, cv_row, train_row_preds)
 
 def train_single_grid_cell(m, n, state):
     # print m, n
+    t = 10
+    folder = state['folder']
     data = np.loadtxt(state['grid'].getGridFile(m, n), dtype = float, delimiter = ',')
-    top3 = sorted(state['grid'].M[m][n].items(), cmp = lambda x, y: cmp(x[1], y[1]), reverse = True)[:3]
-    top3 = map(lambda x: x[0], top3)
-    y = len(top3)
-    if y < 3:
-    top3 += [5348440074]*(3-y)
-    if len(data) == 0 or len(data.shape) == 1:
-        return None, None, None, top3
+    top_t = sorted(state['grid'].M[m][n].items(), cmp = lambda x, y: cmp(x[1], y[1]), reverse = True)[:t]
+    top_t = map(lambda x: x[0], top_t)
+    y = len(top_t)
+    if y < t:
+        top_t += [123]*(t-y) #[5348440074]*(t-y)
+    if len(data) == 0:
+        return None, None, None, top_t, None
+    if len(data.shape) == 1:
+        top_t_train_preds = np.hstack((data[:1], top_t))
+        top_t_train_preds = top_t_train_preds.astype(int)
+        file_name = folder + '_'.join(['top_t_preds', str(m), str(n)]) + '.csv'
+        np.savetxt(file_name, top_t_train_preds, fmt = '%s', delimiter = ',')
+        return None, None, None, top_t, top_t_train_preds
     mask = np.array(map(lambda x: state['grid'].M[m][n][x] > state['threshold'], data[:, 5]))
     masked_data = data[mask, :]
     if len(masked_data) < 10:
-        return None, None, None, top3
+        top_t_train_preds = np.hstack((data[:, 0].reshape(-1, 1), [top_t]*len(data)))
+        top_t_train_preds = top_t_train_preds.astype(int)
+        file_name = folder + '_'.join(['top_t_preds', str(m), str(n)]) + '.csv'
+        np.savetxt(file_name, top_t_train_preds, fmt = '%s', delimiter = ',')
+        return None, None, None, top_t, top_t_train_preds
     X, x_transformer = trans_x(masked_data[:, (1, 2, 3, 4)])
     Y, y_transformer = trans_y(masked_data[:, 5])
 
     if len(Y) == 0:
-        return None, None, None, top3
+        top_t_train_preds = np.hstack((data[:, 0].reshape(-1, 1), [top_t]*len(data)))
+        top_t_train_preds = top_t_train_preds.astype(int)
+        file_name = folder + '_'.join(['top_t_preds', str(m), str(n)]) + '.csv'
+        np.savetxt(file_name, top_t_train_preds, fmt = '%s', delimiter = ',')
+        return None, None, None, top_t, top_t_train_preds
     else:
-        return classifier(X, Y, y_transformer), x_transformer, y_transformer, top3
+        params = dict(state['params_dict'][m][n])
+        params['num_class'] = len(y_transformer['encoder'].classes_)
+        bst = classifier(X, Y, params)
+        X_orig, x_transformer = trans_x(data[:, (1, 2, 3, 4)], x_transformer)
+        dtrain_orig = xgb.DMatrix(X_orig)
+        train_preds_proba = bst.predict(dtrain_orig)
+        if len(train_preds_proba.shape) == 1:
+            train_preds_proba = train_preds_proba.reshape(-1, 1)
+        top_t_train_preds = y_transformer['encoder'].inverse_transform(np.argsort(train_preds_proba, axis = 1)[:, ::-1][:, :t])
+        x, y = top_t_train_preds.shape
+        if y < t:
+            temp_array = [[123]*(t-y)]*x
+            top_t_train_preds= np.hstack((top_t_train_preds, temp_array))
+        top_t_train_preds = np.hstack((data[:, 0].reshape(-1, 1), top_t_train_preds))
+        top_t_train_preds = top_t_train_preds.astype(int)
+        file_name = folder + '_'.join(['top_t_preds', str(m), str(n)]) + '.csv'
+        np.savetxt(file_name, top_t_train_preds, fmt = '%s', delimiter = ',')
+        return bst, x_transformer, y_transformer, top_t, top_t_train_preds
     pass
 
-def predict_single_grid_cell(X, clf, x_transformer, y_transformer, top3):
+def predict_single_grid_cell(X, clf, x_transformer, y_transformer, top_t):
+    t = 10
     data = np.array(X)
     if clf == None:
-        top_3_placeids = np.array([top3]*len(data))
+        top_t_placeids = np.array([top_t]*len(data))
     else:
         temp_x = trans_x(data[:, (1, 2, 3, 4)], x_transformer)[0]
         dtest = xgb.DMatrix(temp_x)
         prediction_probs = clf.predict(dtest)
         if len(prediction_probs.shape) == 1:
             prediction_probs = prediction_probs.reshape(-1, 1)
-        top_3_placeids = y_transformer['encoder'].inverse_transform(np.argsort(prediction_probs, axis = 1)[:, ::-1][:, :3])
-        x, y = top_3_placeids.shape
-        if y < 3:
-            temp_array = np.array([top3[:(3-y)]]*len(top_3_placeids))
-            top_3_placeids = np.hstack((top_3_placeids, temp_array))
-    return np.hstack((data[:, 0].reshape(-1, 1), top_3_placeids))
+        top_t_placeids = y_transformer['encoder'].inverse_transform(np.argsort(prediction_probs, axis = 1)[:, ::-1][:, :t])
+        x, y = top_t_placeids.shape
+        if y < t:
+            temp_array = np.array([top_t[:(t-y)]]*len(top_t_placeids))
+            top_t_placeids = np.hstack((top_t_placeids, temp_array))
+    return np.hstack((data[:, 0].reshape(-1, 1), top_t_placeids))
 
 def trans_x(X, x_transformer = None):
     """
@@ -161,24 +204,11 @@ def trans_y(y, y_transformer = None):
     new_y = y_transformer['encoder'].transform(y).reshape(-1, 1)
     return (new_y, y_transformer)
 
-def classifier(X, Y, y_transformer):
-    param = {}
-    # use softmax multi-class classification
-    param['objective'] = 'multi:softprob'
-    # scale weight of positive examples
-    param['eta'] = 0.1
-    param['max_depth'] = 13
-    param['silent'] = 1
-    param['nthread'] = 4
-    param['num_class'] = len(y_transformer['encoder'].classes_)
-    param['min_child_weight'] = 5
-    param['gamma'] = 0.3
-    param['subsample'] = 0.9
-    param['colsample_bytree'] = 0.7
-    param['scale_pos_weight'] = 1
+def classifier(X, Y, params):
     num_round = 100
     dtrain = xgb.DMatrix(X, label=np.ravel(Y))
-    return xgb.train(param, dtrain, num_round, feval = map3eval)
+    bst = xgb.train(params, dtrain, num_round, feval = map3eval)
+    return bst
 
 class XGB_Model(SklearnModel):
 
@@ -187,43 +217,9 @@ class XGB_Model(SklearnModel):
         X = [[x, y, a, t]]
         """
         return trans_x(X, x_transformer)
-        # fw = [1., 1., 1., 1., 1., 1., 1.]
-        # minute_v = X[:, 3]%60
-        # hour_v = X[:, 3]//60
-        # weekday_v = hour_v//24
-        # month_v = weekday_v//30
-        # year_v = (weekday_v//365 + 1)*fw[5]
-        # hour_v = ((hour_v%24 + 1) + minute_v/60.0)*fw[2]
-        # weekday_v = (weekday_v%7 + 1)*fw[3]
-        # month_v = (month_v%12 +1)*fw[4]
-        # accuracy_v = np.log10(X[:, 2])*fw[6]
-        # x_v = X[:, 0]*fw[0]
-        # y_v = X[:, 1]*fw[1]
-        # X_new = np.hstack((x_v.reshape(-1, 1),\
-        #                  y_v.reshape(-1, 1),\
-        #                  accuracy_v.reshape(-1, 1),\
-        #                  hour_v.reshape(-1, 1),\
-        #                  weekday_v.reshape(-1, 1),\
-        #                  month_v.reshape(-1, 1),\
-        #                  year_v.reshape(-1, 1)))
-        # return (X_new, x_transformer)
 
-
-    def custom_classifier(self, X, Y, y_transformer):
-        classifier(X, Y, y_transformer)
-        # param = {}
-        # # use softmax multi-class classification
-        # param['objective'] = 'multi:softprob'
-        # # scale weight of positive examples
-        # param['eta'] = 0.1
-        # param['max_depth'] = 6
-        # param['silent'] = 1
-        # param['nthread'] = 4
-        # param['num_class'] = len(y_transformer['encoder'].classes_)
-        # param['eval_metric'] = ['merror', 'mlogloss']
-        # num_round = 25
-        # dtrain = xgb.DMatrix(X, label=np.ravel(Y))
-        # return xgb.train(param, dtrain, num_round, feval = map3eval)
+    def custom_classifier(self, X, Y, params):
+        classifier(X, Y, params)
 
     def train_grid(self, m, n):
         """
@@ -252,7 +248,20 @@ class XGB_Model(SklearnModel):
             # if masked data is of length zero then also make model None
             self.model[m][n]['model'] = None
         else:
-            self.model[m][n]['model'] = self.custom_classifier(X, Y, y_transformer)
+            params = {
+                'objective': 'multi:softprob',
+                'eta': 0.1,
+                'max_depth': 13,
+                'min_child_weight': 5,
+                'gamma': 0.3,
+                'subsample': 0.9,
+                'colsample_bytree': 0.7,
+                'scale_pos_weight': 1,
+                'nthread': 4,
+                'silent': 1,
+                'num_class': len(y_transformer['encoder'].classes_)
+            }
+            self.model[m][n]['model'] = self.custom_classifier(X, Y, params)
         # return True
 
         # print "Time taken to train grid %s, %s is: %s" %(m, n, time.time() - init_time)
@@ -294,7 +303,21 @@ class XGB_Model(SklearnModel):
 
         test_X = self.transform_x(test[:, (1, 2, 3, 4)], x_transformer)[0]
 
-        trained_clf = self.custom_classifier(X, Y, y_transformer)
+        params = {
+            'objective': 'multi:softprob',
+            'eta': 0.1,
+            'max_depth': 13,
+            'min_child_weight': 5,
+            'gamma': 0.3,
+            'subsample': 0.9,
+            'colsample_bytree': 0.7,
+            'scale_pos_weight': 1,
+            'nthread': 4,
+            'silent': 1,
+            'num_class': len(y_transformer['encoder'].classes_)
+        }
+
+        trained_clf = self.custom_classifier(X, Y, params)
 
         print "Predicting the probablity of train set"
         cv_mean_precision_train = self.get_cv(trained_clf, masked_train, y_transformer)
@@ -342,33 +365,83 @@ class XGB_Model(SklearnModel):
         state['test_grid'] = test_grid_wise_data
         state['threshold'] = self.threshold
 
-        p = Pool(8)
+        default_xgb_params = {
+            'objective': 'multi:softprob',
+            'eta': 0.1,
+            'max_depth': 3,
+            'min_child_weight': 6,
+            'gamma': 0.1,
+            'subsample': 0.9,
+            'colsample_bytree': 0.6,
+            'scale_pos_weight': 1,
+            'nthread': 4,
+            'silent': 1,
+            'alpha': 0.005
+        }
+
+        paramsFile = self.grid.getParamsFile(5, 10)
+        if paramsFile == None:
+            print "params file doesn't exist.. so loading default params"
+            state['params_dict'] = [[default_xgb_params for n in range(self.grid.max_n + 1)]\
+                                        for m in range(self.grid.max_m + 1)]
+        else:
+            state['params_dict'] = pickle.load(open(paramsFile, 'rb'))
+
+        submission_name = os.path.basename(submission_file)[:-4]
+
+        folder = self.grid.getFolder()[:-1] + '_' + submission_name + '/'
+        if not os.path.exists(folder):
+            os.makedirs(folder)
+
+        state['folder'] = folder
+
+        p = Pool(4)
         row_results = p.map(StateLoader(state), range(self.grid.max_m + 1))
+        p.close()
+        p.join()
+        del(test_grid_wise_data)
+        del(cv_grid_wise_data)
         print "Training time of parallel processing %s" %(time.time() - init_time)
-        # row_results = map(StateLoader(state), range(self.grid.max_m - 1, self.grid.max_m + 1))
+        # row_results = map(StateLoader(state), range(1))
         # pdb.set_trace()
         test_rows = map(lambda x: x[0], row_results)
         cv_rows = map(lambda x: x[1], row_results)
+        # train_rows_preds = map(lambda x: x[2], row_results)
 
         test_rows = filter(lambda x: x != None, test_rows)
         cv_rows = filter(lambda x: x != None, cv_rows)
+        # train_rows_preds = filter(lambda x: x != None, train_rows_preds)
 
         # pdb.set_trace()
         test_preds = np.vstack(test_rows).astype(int)
         cv_preds = np.vstack(cv_rows).astype(int)
+        # train_preds = np.vstack(train_rows_preds).astype(int)
+
+        print test_preds.shape, 'test preds shape'
+        print cv_preds.shape, 'cv preds shape'
+        # print train_preds.shape, 'train preds shape'
+        print test_preds[0], 'first row of test preds'
+        print cv_preds[0], 'first row of cv preds'
+        # print train_preds[0], 'first row of train preds'
 
         sorted_test = test_preds[test_preds[:, 0].argsort()]
-        # TODO: Dump test results top 20 here
-        # np.savetxt(submission_file + '_test_top_20' , sorted_test,\
-        #     fmt = '%s', delimiter = ',')
+        print "saving top t test preds"
+        np.savetxt(folder + 'test_top_t.csv' , sorted_test,\
+            fmt = '%s', delimiter = ',')
+
+        # sorted_train = train_preds[train_preds[:, 0].argsort()]
+        # print "saving top t train preds"
+        # np.savetxt(submission_file + '_train_top_t', sorted_train,\
+        #    fmt = '%s', delimiter = ',')
+
         sorted_cv = cv_preds[cv_preds[:, 0].argsort()]
+        print "saving top t cv preds"
+        np.savetxt(folder + 'cv_top_t.csv' , sorted_cv,\
+            fmt = '%s', delimiter = ',')
 
         actual_cv = cv_data[:, -1].astype(int).reshape(-1, 1)
         cv_a_p = np.hstack((sorted_cv, actual_cv))
-        # np.savetxt(submission_file + '_train_top_20' , cv_a_p,\
-        #     fmt = '%s', delimiter = ',')
-        # TODO: Dump train top 20 here
-        apk_list = map(lambda row: apk(row[-1:], row[1:-1]), cv_a_p)
+        apk_list = map(lambda row: apk(row[-1:], row[1:4]), cv_a_p)
         self.cv_mean_precision = np.mean(apk_list)
         print "mean precision of cross validation set", str(self.cv_mean_precision)
 
