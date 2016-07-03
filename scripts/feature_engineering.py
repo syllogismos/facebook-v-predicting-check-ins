@@ -9,6 +9,7 @@ import itertools
 from multiprocessing import Pool
 from base_scikit_learn_model import get_grids_of_a_point
 import csv
+import traceback
 
 g = grid.Grid(200, 50, 20, 5, pref = 'grid')
 
@@ -153,6 +154,7 @@ def generate_test_feature_files(grid, submission_name):
         except Exception, e:
             print e
             print a
+            traceback.format_exc()
             break
 
     temp = [map(lambda file_handle: file_handle.close(), row) for row in file_handles]
