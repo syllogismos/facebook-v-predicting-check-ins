@@ -166,8 +166,14 @@ def generate_feature_in_grid(grid, submission_name, m, n):
     data = load_data_from_grid(m, n)
     if len(data) == 0:
         return
+    if len(data.shape) == 1:
+        data = data.reshape(1, len(data))
+
     try:
         top_t_data = np.loadtxt(get_top_places_file(g, m, n, submission_name), delimiter = ',', dtype = int)
+        if len(top_t_data.shape) == 1:
+            top_t_data = top_t_data.reshape(1, len(top_t_data))
+
     except IOError:
         print m, n, "no top_t_data file exists for this grid cell"
         top_t_data = np.hstack((data[:, 1].reshape(-1, 1), [[123]*10]*len(data)))
