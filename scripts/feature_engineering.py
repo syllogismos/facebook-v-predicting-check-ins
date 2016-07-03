@@ -150,6 +150,10 @@ def generate_test_feature_files(grid, submission_name):
             file_handles[m][n].write(line)
             if progress % 1000000 == 0:
                 print 'parsing line %s' %(progress)
+        except Exception, e:
+            print e
+            print a
+            break
 
     temp = [map(lambda file_handle: file_handle.close(), row) for row in file_handles]
 
