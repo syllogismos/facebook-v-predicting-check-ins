@@ -92,5 +92,5 @@ def generate_feature_in_grid(grid, submission_name, m, n):
 
     feature_items = sorted(features.items(), cmp = lambda x, y: cmp(x[0], y[0]))
     feature_data = np.array(map(lambda row: np.hstack(([row[0]], row[1])), feature_items))
-    file_name = grid.getFeaturesFolder() + '_'.join(['feature', str(m), str(n)]) + '.csv'
+    file_name = grid.getFeaturesFolder(submission_name) + '_'.join(['feature', str(m), str(n)]) + '.csv'
     np.savetxt(file_name, feature_data, delimiter = ',')
