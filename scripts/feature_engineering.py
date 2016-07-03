@@ -122,7 +122,7 @@ def generate_feature(orig_file, top_t_file, feature_file):
 
     features = {}
     for i in data_dict.keys():
-        if in in top_t_dict:
+        if i in top_t_dict:
             features[i] = get_features_from_ids(data_dict[i], top_t_dict[i])
         else:
             features[i] = np.array([-999]*130)
