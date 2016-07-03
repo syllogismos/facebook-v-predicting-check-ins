@@ -199,6 +199,9 @@ class Grid(object):
     def getTopPlacesFolder(self, submission_name):
         return self.getFolder()[:-1] + '_' + submission_name + '/'
 
+    def getFeaturesFile(self, submission_name, m, n):
+        return self.getFeaturesFolder + '_'.join(['feature', str(m), str(n)]) + '.csv'
+
     def getFeaturesFolder(self, submission_name):
         return '_'.join([self.getFolder()[:-1], submission_name, 'features']) + '/'
 
@@ -211,8 +214,7 @@ class Grid(object):
     def getParamsFile(self, rx, ry):
         rx = 'rx' + str(rx)
         ry = 'ry' + str(ry)
-        paramsFile = self.getFolder() + '_'.join(['grid', str(self.X), str(self.Y), str(self.xd), str(self.yd),\
-            rx, ry, 'params_dict.pickle'])
+        paramsFile = self.getFolder() + '_'.join([rx, ry, 'params_dict.pickle'])
         if os.path.exists(paramsFile):
             return paramsFile
         else:

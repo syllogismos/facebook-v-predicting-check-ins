@@ -23,6 +23,7 @@ import traceback
 import grid_generation as grid
 
 from helpers import zip_file_and_upload_to_s3
+import time
 
 params_range = {'a': range(1, 5),
           'b': range(6, 9)}
@@ -169,7 +170,7 @@ def get_map_of_xgb(grid_param):
     cv_params.update(num_class)
     cv_params.update(grid_param)
     # print orig_params, grid_param
-    temp_cv = xgb.cv(cv_params, dtrain, num_boost_round = 100,
+    temp_cv = xgb.cv(cv_params, dtrain, num_boost_round = 30,
              early_stopping_rounds = 20, feval = map3eval, maximize = True)
     temp_map = temp_cv['test-MAP@3-mean'][temp_cv.shape[0]-1]
     grid_param['map'] = temp_map
@@ -205,6 +206,7 @@ if __name__ == '__main__':
 
     for Mt in range(M):
         for Nt in range(N):
+            init_time = time.time()
             orig_params = {
                 'silent': 1,
                 'nthread': 8,
@@ -246,7 +248,7 @@ if __name__ == '__main__':
                     if (mt + mc) < (g.max_m + 1) and (nt + nc) < (g.max_n + 1):
                         params_dict[mt + mc][nt + nc] = dict(orig_params)
 
-            print "computed params for big grid %s, %s" %(Mt, Nt)
+            print "computed params for big grid %s, %s in time %s" %(Mt, Nt, time.time() - init_time)
             print orig_params
             print "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 
