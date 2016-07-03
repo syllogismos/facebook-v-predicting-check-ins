@@ -361,15 +361,15 @@ class XGB_Model(SklearnModel):
         init_time = time.time()
         feature_submission_name = ''
         cv_data = np.loadtxt(self.cross_validation_file, dtype = float, delimiter = ',')
-        cv_feature_data = np.loadtxt(self.grid.getFeaturesFolder(feature_submission_name) + 'cv_top_t.csv',\
+        cv_feature_data = np.loadtxt(self.grid.getFeaturesFolder(feature_submission_name) + 'cv_feature.csv',\
             delimiter = ',')
         cv_combined = np.hstack((cv_data[:, :-1], cv_feature_data[:, 1:], cv_data[:, -1].reshape(-1, -1)))
         del(cv_data)
         del(cv_feature_data)
 
         test_data = np.loadtxt(self.test_file, dtype = float, delimiter = ',')
-        test_feature_data = np.loadtxt(self.grid.getFeaturesFolder(feature_submission_name) + 'test_top_t.csv',\
-            delimiter = ',')
+        test_feature_data = np.loadtxt(self.grid.getFeaturesFolder(feature_submission_name) + \
+            'test_feature.csv', delimiter = ',')
         test_combined = np.hstack((test_data, test_feature_data[:, 1:]))
         del(test_data)
         del(test_feature_data)

@@ -94,3 +94,40 @@ def generate_feature_in_grid(grid, submission_name, m, n):
     feature_data = np.array(map(lambda row: np.hstack(([row[0]], row[1])), feature_items))
     file_name = grid.getFeaturesFolder(submission_name) + '_'.join(['feature', str(m), str(n)]) + '.csv'
     np.savetxt(file_name, feature_data, delimiter = ',')
+
+def generate_test_feature(grid, submission_name):
+    folder = grid.getFeaturesFolder(submission_name)
+    if not os.path.exists(folder):
+        os.makedirs(folder)
+    orig_file = '../test.csv'
+    top_t_file = grid.getTopPlacesFolder(submission_name) + 'test_top_t.csv'
+    feature_file = grid.getFeaturesFolder(submission_name) + 'test_feature.csv'
+    generate_feature(orig_file, top_t_file, feature_file)
+
+def generate_cv_feature(grid, submission_name):
+    folder = grid.getFeaturesFolder(submission_name)
+    if not os.path.exists(folder):
+        os.makedirs(folder)
+    orig_file = '../main_cv_0.02_5.csv'
+    top_t_file = grid.getTopPlacesFolder(submission_name) + 'cv_top_t.csv'
+    feature_file = grid.getFeaturesFolder(submission_name) + 'cv_feature.csv'
+    generate_feature(orig_file, top_t_file, feature_file)
+
+def generate_feature(orig_file, top_t_file, feature_file):
+    data = np.loadtxt(orig_file, delimiter = ',')
+    top_t_data = np.loadtxt(top_t_file, delimiter = ',', dtype = int)
+
+    data_dict = get_stat_dict(data)
+    top_t_dict = get_stat_dict(top_t_data)
+
+    features = {}
+    for i in data_dict.keys():
+        if in in top_t_dict:
+            features[i] = get_features_from_ids(data_dict[i], top_t_dict[i])
+        else:
+            features[i] = np.array([-999]*130)
+
+    feature_items = sorted(features.items(), cmp = lambda x, y: cmp(x[0], y[0]))
+    feature_data = np.array(map(lambda row: np.hstack(([row[0]], row[1])), feature_items))
+
+    np.savetxt(feature_file, feature_data, delimiter = ',')
