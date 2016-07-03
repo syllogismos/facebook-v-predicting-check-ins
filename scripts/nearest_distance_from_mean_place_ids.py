@@ -21,6 +21,14 @@ def build_stat_xy_matrix(stat = 'mean', acc = 3):
     del(sub_matrices)
     return mean_matrix
 
+def build_time_matrix():
+    file_names = map(lambda x: '../split_train/' + str(x) + '_time', range(1, 23))
+    load_data = lambda file_name: np.loadtxt(file_name, dtype = 'float', delimiter=',', skiprows=1)
+    sub_matrices = map(load_data, file_names)
+    time_matrix = np.vstack(sub_matrices)
+    del(sub_matrices)
+    return time_matrix
+
 def build_mode_xy_matrix(acc = 3):
     file_names = map(lambda x: '../split_train/' + str(x) + '_mode', range(1,23))
     if acc == 2:

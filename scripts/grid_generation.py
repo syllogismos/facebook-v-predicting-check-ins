@@ -196,6 +196,12 @@ class Grid(object):
     def getFolder(self):
         return '../' + '_'.join([self.pref, str(self.X), str(self.Y), str(self.xd), str(self.yd)]) + '/'
 
+    def getTopPlacesFolder(self, submission_name):
+        return self.getFolder()[:-1] + '_' + submission_name + '/'
+
+    def getFeaturesFolder(self, submission_name):
+        return self.getFolder()[:-1] + '_'.join([submission_name, features]) + '/'
+
     def getGirdFiles(self):
         c = itertools.product(range(self.max_m + 1), range(self.max_ni + 1))
         grid_files = map(lambda x: self.getFolder() + '_'.join(['grid_data', str(x[0]), str(x[1])])\
