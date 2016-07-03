@@ -85,11 +85,28 @@ class GridLoader(object):
     def __call__(self, grid_id):
         generate_feature_in_grid(self.grid, self.submission_name, grid_id[0], grid_id[1])
 
+
+fmt = ['%.0f',\
+    '%.1f', '%.0f', '%.0f', '%.0f', '%.0f', '%.0f', '%.0f', '%.0f', '%.0f', '%.2f', '%.4f', '%.4f', '%.4f',\
+    '%.1f', '%.0f', '%.0f', '%.0f', '%.0f', '%.0f', '%.0f', '%.0f', '%.0f', '%.2f', '%.4f', '%.4f', '%.4f',\
+    '%.1f', '%.0f', '%.0f', '%.0f', '%.0f', '%.0f', '%.0f', '%.0f', '%.0f', '%.2f', '%.4f', '%.4f', '%.4f',\
+    '%.1f', '%.0f', '%.0f', '%.0f', '%.0f', '%.0f', '%.0f', '%.0f', '%.0f', '%.2f', '%.4f', '%.4f', '%.4f',\
+    '%.1f', '%.0f', '%.0f', '%.0f', '%.0f', '%.0f', '%.0f', '%.0f', '%.0f', '%.2f', '%.4f', '%.4f', '%.4f',\
+    '%.1f', '%.0f', '%.0f', '%.0f', '%.0f', '%.0f', '%.0f', '%.0f', '%.0f', '%.2f', '%.4f', '%.4f', '%.4f',\
+    '%.1f', '%.0f', '%.0f', '%.0f', '%.0f', '%.0f', '%.0f', '%.0f', '%.0f', '%.2f', '%.4f', '%.4f', '%.4f',\
+    '%.1f', '%.0f', '%.0f', '%.0f', '%.0f', '%.0f', '%.0f', '%.0f', '%.0f', '%.2f', '%.4f', '%.4f', '%.4f',\
+    '%.1f', '%.0f', '%.0f', '%.0f', '%.0f', '%.0f', '%.0f', '%.0f', '%.0f', '%.2f', '%.4f', '%.4f', '%.4f',\
+    '%.1f', '%.0f', '%.0f', '%.0f', '%.0f', '%.0f', '%.0f', '%.0f', '%.0f', '%.2f', '%.4f', '%.4f', '%.4f']
+
 def generate_feature_in_grid(grid, submission_name, m, n):
     """
     """
     data = load_data_from_grid(m, n)
-    top_t_data = np.loadtxt(get_top_places_file(g, m, n, submission_name), delimiter = ',', dtype = int)
+    try:
+        top_t_data = np.loadtxt(get_top_places_file(g, m, n, submission_name), delimiter = ',', dtype = int)
+    except IOError:
+        print m, n, "no top_t_data file exists for this grid cell"
+        top_t_data = np.hstack((data[:, 1].reshape(-1, 1), [[123]*10]*len(data)))
 
     data_dict = get_stat_dict(data)
     top_t_dict = get_stat_dict(top_t_data)
@@ -104,7 +121,7 @@ def generate_feature_in_grid(grid, submission_name, m, n):
     feature_items = sorted(features.items(), cmp = lambda x, y: cmp(x[0], y[0]))
     feature_data = np.array(map(lambda row: np.hstack(([row[0]], row[1])), feature_items))
     file_name = grid.getFeaturesFolder(submission_name) + '_'.join(['feature', str(m), str(n)]) + '.csv'
-    np.savetxt(file_name, feature_data, delimiter = ',')
+    np.savetxt(file_name, feature_data, delimiter = ',', fmt = fmt)
 
 def generate_grid_features(grid, submission_name):
     m = range(grid.max_m + 1)
@@ -150,4 +167,4 @@ def generate_feature(orig_file, top_t_file, feature_file):
     feature_items = sorted(features.items(), cmp = lambda x, y: cmp(x[0], y[0]))
     feature_data = np.array(map(lambda row: np.hstack(([row[0]], row[1])), feature_items))
 
-    np.savetxt(feature_file, feature_data, delimiter = ',')
+    np.savetxt(feature_file, feature_data, delimiter = ',', fmt = fmt)
