@@ -122,7 +122,7 @@ def generate_test_feature_files(grid, submission_name):
     for m in range(grid.max_m + 1):
         for n in range(grid.max_n + 1):
             np.savetxt('_'.join([test_feature_prefix, str(m), str(n)]) + '.csv', \
-                np.array(test_grid_wise_data[m][n], delimiter = ',', \
+                np.array(test_grid_wise_data[m][n]), delimiter = ',', \
                 fmt = ['%.0f', '%.5f', '%.5f', '%.0f', '%.0f'] + fmt[1:])
 
 def generate_feature_in_grid(grid, submission_name, m, n):
