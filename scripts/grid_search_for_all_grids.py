@@ -220,7 +220,9 @@ if __name__ == '__main__':
                 'nthread': 4,
                 'objective': 'multi:softprob',
                 'scale_pos_weight': 0,
-                'subsample': 0.75}
+                'subsample': 0.75,
+                'silent': 1
+            }
 
             print "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
             print "row %s" %(mt)
