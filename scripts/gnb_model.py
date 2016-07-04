@@ -213,7 +213,7 @@ def classifier(X, Y, params):
     clf = GaussianNB.fit(X, Y)
     return clf
 
-class XGB_Model(SklearnModel):
+class GNB_Model(SklearnModel):
 
     def transform_x(self, X, x_transformer = None):
         """
