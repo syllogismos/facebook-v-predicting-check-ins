@@ -180,8 +180,8 @@ def get_map_of_xgb(grid_param):
 #m, n = (12, 50) (37, 50) (12, 150) (37, 150)
 #dtrain, enc = get_dtrain_enc(12, 50)
 param_range1 = {
-    'max_depth': range(2, 9, 1),
-    'min_child_weight': range(1, 7, 1)
+    'max_depth': range(2, 7, 2),
+    'min_child_weight': range(1, 7, 2)
 }
 
 param_range2 = {
@@ -189,18 +189,71 @@ param_range2 = {
 }
 
 param_range3 = {
-    'subsample': [i/100.0 for i in range(55, 100, 5)],
-    'colsample_bytree': [i/100.0 for i in range(55, 100, 5)]
+    'subsample': [i/10.0 for i in range(5, 10)],
+    'colsample_bytree': [i/10.0 for i in range(5, 10)]
 }
 
 param_range4 = {
+    'max_delta_step': range(3, 9)
+}
+
+param_range5 = {
  'alpha':[0, 1e-5, 0.001, 0.005, 0.01, 0.05, 0.1]
 }
 
 
 
-
 if __name__ == '__main__':
+
+    params_dict = [[{} for nt in range(g.max_n + 1)] for mt in range(g.max_m + 1)]
+
+    for mt in range(g.max_m + 1):
+        for nt in range(g.max_n / 2, g.max_n / 2 + 1):
+            init_time = time.time()
+
+            orig_params = {'colsample_bytree': 0.6,
+                'eta': 0.1,
+                'gamma': 0.4,
+                'max_delta_step': 7,
+                'max_depth': 4,
+                'min_child_weight': 1,
+                'nthread': 4,
+                'objective': 'multi:softprob',
+                'scale_pos_weight': 0,
+                'subsample': 0.75}
+
+            print "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+            print "row %s" %(mt)
+
+            dtrain, enc = get_dtrain_enc(mt, nt)
+
+            for param_range in [param_range1, param_range2, param_range3]:
+                result = None
+                try:
+                    result = grid_search_xgb(param_range)
+                except Exception, e:
+                    print e
+                    print traceback.format_exc()
+
+                if result != None:
+                    temp_param = result[0]
+                    del(temp_param['map'])
+                    orig_params.update(temp_param)
+
+            for ntt in range(g.max_n + 1):
+                params_dict[mt][nt] = dict(orig_params)
+
+            print "computed params for big grid %s, %s in time %s" %(mt, nt, time.time() - init_time)
+            # print orig_params
+            print "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+
+    fName = '../row_wise_grid_search_results.pickle'
+    pickle.dump(params_dict, open(fName, 'wb'))
+    zip_file_and_upload_to_s3(fName)
+
+
+
+if __name__ == '__main__1':
 
     params_dict = [[{} for nt in range(g.max_n + 1)] for mt in range(g.max_m + 1)]
 
