@@ -210,7 +210,8 @@ def trans_y(y, y_transformer = None):
     return (new_y, y_transformer)
 
 def classifier(X, Y, params):
-    clf = GaussianNB.fit(X, Y)
+    clf = GaussianNB()
+    clf.fit(X, Y)
     return clf
 
 class GNB_Model(SklearnModel):
