@@ -184,6 +184,43 @@ def predict_single_grid_cell(X, clf, x_transformer, y_transformer, top_t, m, n, 
             top_t_placeids = np.hstack((top_t_placeids, temp_array))
     return np.hstack((data[:, 0].reshape(-1, 1), top_t_placeids))
 
+# def trans_x(X, x_transformer = None):
+#     """
+#     X = [[x, y, a, t, feats]]
+#     """
+#     fw = [1., 1., 1., 1., 1., 1., 1.]
+#     minute_v = X[:, 3]%60
+#     hour_v = X[:, 3]//60
+#     weekday_v = hour_v//24
+#     month_v = weekday_v//30
+#     year_v = (weekday_v//365 + 1)*fw[5]
+#     hour_v = ((hour_v%24 + 1) + minute_v/60.0)*fw[2]
+#     hour_v_2 = (X[:, 3]%(60*60*24))//(60*60*2)
+#     hour_v_3 = (X[:, 3]%(60*60*24))//(60*60*3)
+#     hour_v_4 = (X[:, 3]%(60*60*24))//(60*60*4)
+#     hour_v_6 = (X[:, 3]%(60*60*24))//(60*60*6)
+#     hour_v_8 = (X[:, 3]%(60*60*24))//(60*60*8)
+#     weekday_v = (weekday_v%7 + 1)*fw[3]
+#     month_v = (month_v%12 +1)*fw[4]
+#     accuracy_v = np.log10(X[:, 2])*fw[6]
+#     x_v = X[:, 0]*fw[0]
+#     y_v = X[:, 1]*fw[1]
+#     X_new = np.hstack((x_v.reshape(-1, 1),\
+#                      y_v.reshape(-1, 1),\
+#                      accuracy_v.reshape(-1, 1),\
+#                      hour_v.reshape(-1, 1),\
+#                      hour_v_2.reshape(-1, 1),\
+#                      hour_v_3.reshape(-1, 1),\
+#                      hour_v_4.reshape(-1, 1),\
+#                      hour_v_6.reshape(-1, 1),\
+#                      hour_v_8.reshape(-1, 1),\
+#                      weekday_v.reshape(-1, 1),\
+#                      month_v.reshape(-1, 1),\
+#                      year_v.reshape(-1, 1),\
+#                      X[:, 4:]))
+#
+#     return (X_new, x_transformer)
+
 def trans_x(X, x_transformer = None):
     """
     X = [[x, y, a, t, feats]]
@@ -205,6 +242,22 @@ def trans_x(X, x_transformer = None):
     accuracy_v = np.log10(X[:, 2])*fw[6]
     x_v = X[:, 0]*fw[0]
     y_v = X[:, 1]*fw[1]
+
+    x_h = np.median(X[:, range(4, 134, 13)], axis = 1).reshape(-1, 1)
+    x_h2 = np.median(X[:, range(5, 134, 13)], axis = 1).reshape(-1, 1)
+    x_h3 = np.median(X[:, range(6, 134, 13)], axis = 1).reshape(-1, 1)
+    x_h4 = np.median(X[:, range(7, 134, 13)], axis = 1).reshape(-1, 1)
+    x_h6 = np.median(X[:, range(8, 134, 13)], axis = 1).reshape(-1, 1)
+    x_h8 = np.median(X[:, range(9, 134, 13)], axis = 1).reshape(-1, 1)
+    x_week = np.median(X[:, range(10, 134, 13)], axis = 1).reshape(-1, 1)
+    x_month = np.median(X[:, range(11, 134, 13)], axis = 1).reshape(-1, 1)
+    x_count = np.log10(np.median(X[:, range(12, 134, 13)], axis = 1)).reshape(-1, 1)
+    x_a_med = np.log10(np.median(X[:, range(13, 134, 13)], axis = 1)).reshape(-1, 1)
+    x_x_med = np.median(X[:, range(14, 134, 13)], axis = 1).reshape(-1, 1)
+    x_y_med = np.median(X[:, range(15, 134, 13)], axis = 1).reshape(-1, 1)
+    x_abs_distance = np.median(X[:, range(16, 134, 13)], axis = 1).reshape(-1, 1)
+    median_stats = np.hstack((x_h, x_h2, x_h3, x_h4, x_h6, x_h8, x_week, x_month, x_count, x_a_med, x_x_med, x_y_med, x_abs_distance))
+
     X_new = np.hstack((x_v.reshape(-1, 1),\
                      y_v.reshape(-1, 1),\
                      accuracy_v.reshape(-1, 1),\
@@ -217,7 +270,7 @@ def trans_x(X, x_transformer = None):
                      weekday_v.reshape(-1, 1),\
                      month_v.reshape(-1, 1),\
                      year_v.reshape(-1, 1),\
-                     X[:, 4:]))
+                     median_stats))
 
     return (X_new, x_transformer)
 
@@ -369,9 +422,9 @@ class XGB_Model(SklearnModel):
         apk_list = map(lambda row: apk(row[-1:], row[: -1]), preds)
         return np.mean(apk_list)
 
-    def train_and_predict_parallel(self, submission_file, upload_to_s3 = False):
+    def train_and_predict_parallel(self, submission_file, feature_prefix = 'grid_200_50_20_5_def_params_th7_n100', upload_to_s3 = False):
         init_time = time.time()
-        feature_submission_name = 'ec2_colsample_bytree0_6_scale_pos_weight1_min_child_weight6_subsample0_9_eta0_1_max_depth3_gamma0_1_th3_n200'
+        feature_submission_name = feature_prefix
         cv_data = np.loadtxt(self.cross_validation_file, dtype = float, delimiter = ',')
         cv_feature_data = np.loadtxt(self.grid.getFeaturesFolder(feature_submission_name) + 'cv_feature.csv',\
             delimiter = ',')
