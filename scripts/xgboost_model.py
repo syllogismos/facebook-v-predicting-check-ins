@@ -205,7 +205,7 @@ def trans_y(y, y_transformer = None):
     return (new_y, y_transformer)
 
 def classifier(X, Y, params):
-    num_round = 200
+    num_round = 100
     dtrain = xgb.DMatrix(X, label=np.ravel(Y))
     bst = xgb.train(params, dtrain, num_round, feval = map3eval)
     return bst
@@ -394,7 +394,7 @@ class XGB_Model(SklearnModel):
 
         state['folder'] = folder
 
-        p = Pool(4)
+        p = Pool(8)
         row_results = p.map(StateLoader(state), range(self.grid.max_m + 1))
         p.close()
         p.join()

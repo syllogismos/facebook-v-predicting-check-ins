@@ -136,8 +136,8 @@ def generate_test_feature_files(grid, submission_name):
     test_feature_csv = csv.reader(test_feature_data)
 
     file_handles = [[open('_'.join([test_feature_prefix, str(m), str(n)]) + '.csv', 'wb')\
-                for m in range(grid.max_n + 1)]\
-                for n in range(grid.max_m + 1)]
+                for n in range(grid.max_n + 1)]\
+                for m in range(grid.max_m + 1)]
 
     progress = 0
     while True:

@@ -200,7 +200,7 @@ class Grid(object):
         return self.getFolder()[:-1] + '_' + submission_name + '/'
 
     def getFeaturesFile(self, submission_name, m, n):
-        return self.getFeaturesFolder + '_'.join(['feature', str(m), str(n)]) + '.csv'
+        return self.getFeaturesFolder(submission_name) + '_'.join(['feature', str(m), str(n)]) + '.csv'
 
     def getFeaturesFolder(self, submission_name):
         return '_'.join([self.getFolder()[:-1], submission_name, 'features']) + '/'

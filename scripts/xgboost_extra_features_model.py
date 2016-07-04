@@ -99,7 +99,7 @@ def train_single_grid_cell(m, n, state):
     if len(data) == 0:
         return None, None, None, top_t, None
 
-    data_feature = np.loadtxt(state['grid'].getFeaturesFile(state['submission_name'], m, n),\
+    data_feature = np.loadtxt(state['grid'].getFeaturesFile(state['feature_submission_name'], m, n),\
         delimiter = ',')
 
     if len(data.shape) == 1:
@@ -158,18 +158,21 @@ def train_single_grid_cell(m, n, state):
 def predict_single_grid_cell(X, clf, x_transformer, y_transformer, top_t, m, n, test = False, ff = None):
     t = 10
     data = np.array(X)
-    if test == True:
+    if test:
         if len(data) != 0:
-            test_features = np.loadtxt(ff + '_'.join(['test_feature', str(m), str(n)] + '.csv', delimiter = ',')
-            if len(data.shape) == 1:
-                data = data.reshape(1, len(data))
-                test_features = test_features.reshape(1, len(data))
+            test_features = np.loadtxt(ff + '_'.join(['test_feature', str(m), str(n)]) + '.csv', delimiter = ',')
+            if len(data) == 1:
+                # data = data.reshape(1, len(data))
+                test_features = test_features.reshape(1, len(test_features))
             data = np.hstack((data, test_features[:, 1:]))
 
     if clf == None:
         top_t_placeids = np.array([top_t]*len(data))
     else:
-        temp_x = trans_x(data[:, (1, 2, 3, 4)], x_transformer)[0]
+        if test:
+            temp_x = trans_x(data[:, 1:], x_transformer)[0]
+        else:
+            temp_x = trans_x(data[:, 1:-1], x_transformer)[0]
         dtest = xgb.DMatrix(temp_x)
         prediction_probs = clf.predict(dtest)
         if len(prediction_probs.shape) == 1:
@@ -214,7 +217,7 @@ def trans_x(X, x_transformer = None):
                      weekday_v.reshape(-1, 1),\
                      month_v.reshape(-1, 1),\
                      year_v.reshape(-1, 1),\
-                     X[:, 4]))
+                     X[:, 4:]))
 
     return (X_new, x_transformer)
 
@@ -231,7 +234,7 @@ def trans_y(y, y_transformer = None):
     return (new_y, y_transformer)
 
 def classifier(X, Y, params):
-    num_round = 100
+    num_round = 2
     dtrain = xgb.DMatrix(X, label=np.ravel(Y))
     bst = xgb.train(params, dtrain, num_round, feval = map3eval)
     return bst
@@ -368,11 +371,11 @@ class XGB_Model(SklearnModel):
 
     def train_and_predict_parallel(self, submission_file, upload_to_s3 = False):
         init_time = time.time()
-        feature_submission_name = ''
+        feature_submission_name = 'ec2_colsample_bytree0_6_scale_pos_weight1_min_child_weight6_subsample0_9_eta0_1_max_depth3_gamma0_1_th3_n200'
         cv_data = np.loadtxt(self.cross_validation_file, dtype = float, delimiter = ',')
         cv_feature_data = np.loadtxt(self.grid.getFeaturesFolder(feature_submission_name) + 'cv_feature.csv',\
             delimiter = ',')
-        cv_combined = np.hstack((cv_data[:, :-1], cv_feature_data[:, 1:], cv_data[:, -1].reshape(-1, -1)))
+        cv_combined = np.hstack((cv_data[:, :-1], cv_feature_data[:, 1:], cv_data[:, -1].reshape(-1, 1)))
         del(cv_data)
         del(cv_feature_data)
 
@@ -416,7 +419,6 @@ class XGB_Model(SklearnModel):
             'scale_pos_weight': 1,
             'nthread': 4,
             'silent': 1,
-            'alpha': 0.005
         }
 
         paramsFile = self.grid.getParamsFile(5, 10)
@@ -430,12 +432,12 @@ class XGB_Model(SklearnModel):
         submission_name = os.path.basename(submission_file)[:-4]
 
         folder = self.grid.getFolder()[:-1] + '_' + submission_name + '/'
-        # if not os.path.exists(folder):
-        #     os.makedirs(folder)
+        if not os.path.exists(folder):
+            os.makedirs(folder)
 
         state['folder'] = folder
 
-        p = Pool(4)
+        p = Pool(8)
         row_results = p.map(StateLoader(state), range(self.grid.max_m + 1))
         p.close()
         p.join()
@@ -479,7 +481,7 @@ class XGB_Model(SklearnModel):
         np.savetxt(folder + 'cv_top_t.csv' , sorted_cv,\
             fmt = '%s', delimiter = ',')
 
-        actual_cv = cv_data[:, -1].astype(int).reshape(-1, 1)
+        actual_cv = cv_combined[:, -1].astype(int).reshape(-1, 1)
         cv_a_p = np.hstack((sorted_cv, actual_cv))
         apk_list = map(lambda row: apk(row[-1:], row[1:4]), cv_a_p)
         self.cv_mean_precision = np.mean(apk_list)
