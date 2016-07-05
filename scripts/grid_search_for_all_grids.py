@@ -170,7 +170,7 @@ def get_map_of_xgb(grid_param):
     cv_params.update(num_class)
     cv_params.update(grid_param)
     # print orig_params, grid_param
-    temp_cv = xgb.cv(cv_params, dtrain, num_boost_round = 30,
+    temp_cv = xgb.cv(cv_params, dtrain, num_boost_round = 100,
              early_stopping_rounds = 20, feval = map3eval, maximize = True)
     temp_map = temp_cv['test-MAP@3-mean'][temp_cv.shape[0]-1]
     grid_param['map'] = temp_map
