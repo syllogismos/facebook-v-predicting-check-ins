@@ -135,7 +135,7 @@ def get_dtrain_enc(m, n):
     print X.shape, "X shape"
     print y.shape, "y shape"
     print len(enc['encoder'].classes_), "no of classes"
-    logger.debug("no of classes: %s" %(len(enc['encoder'].classes_)))
+    logging.debug("no of classes: %s" %(len(enc['encoder'].classes_)))
 
     dtrain = xgb.DMatrix(X, label=np.ravel(y))
     return (dtrain, enc)
