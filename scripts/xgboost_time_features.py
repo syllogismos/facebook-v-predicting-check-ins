@@ -415,7 +415,7 @@ class XGB_Model(SklearnModel):
             'max_delta_step': 7
         }
 
-        paramsFile = self.grid.getParamsFile(5, 123340)
+        paramsFile = '../correct_row_wise_grid_search_results.pickle'# self.grid.getParamsFile(5, 123340)
         if paramsFile == None:
             print "params file doesn't exist.. so loading default params"
             state['params_dict'] = [[default_xgb_params for n in range(self.grid.max_n + 1)]\
