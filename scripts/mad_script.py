@@ -14,7 +14,7 @@ from sklearn.preprocessing import LabelEncoder
 import time
 from datetime import timedelta
 import gc
-from xgboost import xgb
+import xgboost as xgb
 from xgboost_model import map3eval
 
 # Found at: https://www.kaggle.com/rshekhar2/facebook-v-predicting-check-ins/xgboost-cv-example-with-small-bug
