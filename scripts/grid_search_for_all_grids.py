@@ -170,7 +170,7 @@ def get_map_of_xgb(grid_param):
     cv_params.update(num_class)
     cv_params.update(grid_param)
     # print orig_params, grid_param
-    temp_cv = xgb.cv(cv_params, dtrain, num_boost_round = 30,
+    temp_cv = xgb.cv(cv_params, dtrain, num_boost_round = 100,
              early_stopping_rounds = 20, feval = map3eval, maximize = True)
     temp_map = temp_cv['test-MAP@3-mean'][temp_cv.shape[0]-1]
     grid_param['map'] = temp_map
@@ -207,7 +207,7 @@ if __name__ == '__main__':
 
     params_dict = [[{} for nt in range(g.max_n + 1)] for mt in range(g.max_m + 1)]
 
-    for mt in range(g.max_m + 1):
+    for mt in range(g.max_m):
         for nt in range(g.max_n / 2, g.max_n / 2 + 1):
             init_time = time.time()
 
@@ -244,6 +244,8 @@ if __name__ == '__main__':
 
             for ntt in range(g.max_n + 1):
                 params_dict[mt][nt] = dict(orig_params)
+                if mt == g.max_m -1:
+                    params_dict[mt+1][nt] = dict(orig_params)
 
             print "computed params for big grid %s, %s in time %s" %(mt, nt, time.time() - init_time)
             # print orig_params
