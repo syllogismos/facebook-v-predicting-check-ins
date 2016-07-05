@@ -82,7 +82,7 @@ def process_one_cell(df_cell_train, df_cell_test, fw, th, n_neighbors):
     bst = xgb.train(params, dtrain, num_round, feval = map3eval)
     dtest = xgb.DMatrix(df_cell_test.values)
     y_pred_proba = bst.predict(dtest)
-    y_pred_labels = enc.inverse_transform(np.argsort(y_pred_proba, axis = 1)[:, ::-1][:, :t])
+    y_pred_labels = enc.inverse_transform(np.argsort(y_pred_proba, axis = 1)[:, ::-1][:, :3])
     # y_pred = clf.predict_proba(df_cell_test.values)
     # y_pred_labels = np.argsort(y_pred, axis=1)[:,:-4:-1]
     # pred_labels = clf.classes_[y_pred_labels]
