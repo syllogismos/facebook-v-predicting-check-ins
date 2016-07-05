@@ -177,15 +177,15 @@ def trans_x(X, x_transformer = None):
     month_v = (month_v%12 +1)*fw[4]
     accuracy_v = np.log10(X[:, 2])*fw[6]
 
-    minute_5 = 2*np.pi((X[:, 3]//5)%288)/288
+    minute_5 = 2*np.pi*((X[:, 3]//5)%288)/288
     min_sin = (np.sin(minute_5) + 1).round(4)
     min_cos = (np.cos(minute_5) + 1).round(4)
 
-    day_of_year = 2*np.pi((X[:, 3]//1440)%365)/365
+    day_of_year = 2*np.pi*((X[:, 3]//1440)%365)/365
     day_of_year_sin = (np.sin(day_of_year) + 1).round(4)
     day_of_year_cos = (np.cos(day_of_year) + 1).round(4)
 
-    weekday = 2*np.pi((X[:, 3]//1440)%7)/7
+    weekday = 2*np.pi*((X[:, 3]//1440)%7)/7
     weekday_sin = (np.sin(weekday) + 1).round(4)
     weekday_cos = (np.cos(weekday) + 1).round(4)
 
