@@ -96,46 +96,50 @@ def train_single_grid_cell(m, n, state):
     if len(data) == 0:
         return None, None, None, top_t, None
     if len(data.shape) == 1:
-        top_t_train_preds = np.hstack((data[:1], top_t))
-        top_t_train_preds = top_t_train_preds.astype(int)
-        file_name = folder + '_'.join(['top_t_preds', str(m), str(n)]) + '.csv'
-        np.savetxt(file_name, top_t_train_preds, fmt = '%s', delimiter = ',')
+        top_t_train_preds = None
+        # top_t_train_preds = np.hstack((data[:1], top_t))
+        # top_t_train_preds = top_t_train_preds.astype(int)
+        # file_name = folder + '_'.join(['top_t_preds', str(m), str(n)]) + '.csv'
+        # np.savetxt(file_name, top_t_train_preds, fmt = '%s', delimiter = ',')
         return None, None, None, top_t, top_t_train_preds
     mask = np.array(map(lambda x: state['grid'].M[m][n][x] > state['threshold'], data[:, 5]))
     masked_data = data[mask, :]
     if len(masked_data) < 10:
-        top_t_train_preds = np.hstack((data[:, 0].reshape(-1, 1), [top_t]*len(data)))
-        top_t_train_preds = top_t_train_preds.astype(int)
-        file_name = folder + '_'.join(['top_t_preds', str(m), str(n)]) + '.csv'
-        np.savetxt(file_name, top_t_train_preds, fmt = '%s', delimiter = ',')
+        top_t_train_preds = None
+        # top_t_train_preds = np.hstack((data[:, 0].reshape(-1, 1), [top_t]*len(data)))
+        # top_t_train_preds = top_t_train_preds.astype(int)
+        # file_name = folder + '_'.join(['top_t_preds', str(m), str(n)]) + '.csv'
+        # np.savetxt(file_name, top_t_train_preds, fmt = '%s', delimiter = ',')
         return None, None, None, top_t, top_t_train_preds
     X, x_transformer = trans_x(masked_data[:, (1, 2, 3, 4)])
     Y, y_transformer = trans_y(masked_data[:, 5])
 
     if len(Y) == 0:
-        top_t_train_preds = np.hstack((data[:, 0].reshape(-1, 1), [top_t]*len(data)))
-        top_t_train_preds = top_t_train_preds.astype(int)
-        file_name = folder + '_'.join(['top_t_preds', str(m), str(n)]) + '.csv'
-        np.savetxt(file_name, top_t_train_preds, fmt = '%s', delimiter = ',')
+        top_t_train_preds = None
+        # top_t_train_preds = np.hstack((data[:, 0].reshape(-1, 1), [top_t]*len(data)))
+        # top_t_train_preds = top_t_train_preds.astype(int)
+        # file_name = folder + '_'.join(['top_t_preds', str(m), str(n)]) + '.csv'
+        # np.savetxt(file_name, top_t_train_preds, fmt = '%s', delimiter = ',')
         return None, None, None, top_t, top_t_train_preds
     else:
         params = dict(state['params_dict'][m][n])
         params['num_class'] = len(y_transformer['encoder'].classes_)
         bst = classifier(X, Y, params)
-        X_orig, x_transformer = trans_x(data[:, (1, 2, 3, 4)], x_transformer)
-        dtrain_orig = xgb.DMatrix(X_orig)
-        train_preds_proba = bst.predict(dtrain_orig)
-        if len(train_preds_proba.shape) == 1:
-            train_preds_proba = train_preds_proba.reshape(-1, 1)
-        top_t_train_preds = y_transformer['encoder'].inverse_transform(np.argsort(train_preds_proba, axis = 1)[:, ::-1][:, :t])
-        x, y = top_t_train_preds.shape
-        if y < t:
-            temp_array = [[123]*(t-y)]*x
-            top_t_train_preds= np.hstack((top_t_train_preds, temp_array))
-        top_t_train_preds = np.hstack((data[:, 0].reshape(-1, 1), top_t_train_preds))
-        top_t_train_preds = top_t_train_preds.astype(int)
-        file_name = folder + '_'.join(['top_t_preds', str(m), str(n)]) + '.csv'
-        np.savetxt(file_name, top_t_train_preds, fmt = '%s', delimiter = ',')
+        top_t_train_preds = None
+        # X_orig, x_transformer = trans_x(data[:, (1, 2, 3, 4)], x_transformer)
+        # dtrain_orig = xgb.DMatrix(X_orig)
+        # train_preds_proba = bst.predict(dtrain_orig)
+        # if len(train_preds_proba.shape) == 1:
+        #     train_preds_proba = train_preds_proba.reshape(-1, 1)
+        # top_t_train_preds = y_transformer['encoder'].inverse_transform(np.argsort(train_preds_proba, axis = 1)[:, ::-1][:, :t])
+        # x, y = top_t_train_preds.shape
+        # if y < t:
+        #     temp_array = [[123]*(t-y)]*x
+        #     top_t_train_preds= np.hstack((top_t_train_preds, temp_array))
+        # top_t_train_preds = np.hstack((data[:, 0].reshape(-1, 1), top_t_train_preds))
+        # top_t_train_preds = top_t_train_preds.astype(int)
+        # file_name = folder + '_'.join(['top_t_preds', str(m), str(n)]) + '.csv'
+        # np.savetxt(file_name, top_t_train_preds, fmt = '%s', delimiter = ',')
         return bst, x_transformer, y_transformer, top_t, top_t_train_preds
     pass
 
@@ -415,7 +419,7 @@ class XGB_Model(SklearnModel):
             'max_delta_step': 7
         }
 
-        paramsFile = '../correct_row_wise_grid_search_results.pickle'# self.grid.getParamsFile(5, 123340)
+        paramsFile = None # '../correct_row_wise_grid_search_results.pickle'# self.grid.getParamsFile(5, 123340)
         if paramsFile == None:
             print "params file doesn't exist.. so loading default params"
             state['params_dict'] = [[default_xgb_params for n in range(self.grid.max_n + 1)]\
@@ -453,15 +457,15 @@ class XGB_Model(SklearnModel):
         cv_preds = np.vstack(cv_rows).astype(int)
         # train_preds = np.vstack(train_rows_preds).astype(int)
 
-        print test_preds.shape, 'test preds shape'
-        print cv_preds.shape, 'cv preds shape'
+        # print test_preds.shape, 'test preds shape'
+        # print cv_preds.shape, 'cv preds shape'
         # print train_preds.shape, 'train preds shape'
-        print test_preds[0], 'first row of test preds'
-        print cv_preds[0], 'first row of cv preds'
+        # print test_preds[0], 'first row of test preds'
+        # print cv_preds[0], 'first row of cv preds'
         # print train_preds[0], 'first row of train preds'
 
         sorted_test = test_preds[test_preds[:, 0].argsort()]
-        print "saving top t test preds"
+        # print "saving top t test preds"
         np.savetxt(folder + 'test_top_t.csv' , sorted_test,\
             fmt = '%s', delimiter = ',')
 
@@ -471,7 +475,7 @@ class XGB_Model(SklearnModel):
         #    fmt = '%s', delimiter = ',')
 
         sorted_cv = cv_preds[cv_preds[:, 0].argsort()]
-        print "saving top t cv preds"
+        # print "saving top t cv preds"
         np.savetxt(folder + 'cv_top_t.csv' , sorted_cv,\
             fmt = '%s', delimiter = ',')
 
@@ -489,7 +493,7 @@ class XGB_Model(SklearnModel):
             row_id = row[0]
             row_prediction_string = ' '.join(row[1:4])
             submission.write(row_id + ',' + row_prediction_string + '\n')
-            if i % 1000000 == 0:
+            if i % 50000000 == 0:
                 print "generating %s row of test data" %(i)
         submission.close()
         if upload_to_s3:
