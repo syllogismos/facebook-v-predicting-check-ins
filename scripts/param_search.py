@@ -26,8 +26,23 @@ import grid_generation as grid
 import logging
 logging.basicConfig(filename='param_search.log',level=logging.DEBUG)
 
+import argparse
+parser = argparse.ArgumentParser()
+parser.add_argument("X", type=int)
+parser.add_argument("Y", type=int)
+parser.add_argument("xd", type=int)
+parser.add_argument("yd", type=int)
+parser.add_argument("m", type=int)
+parser.add_argument("n", type=int)
+parser.add_argument("th", type=int)
+args = parser.parse_args()
 
-g = grid.Grid(200, 50, 20, 5, pref = 'grid')
+m = args.m #12
+n = args.n #40
+th = args.th #3
+
+# g = grid.Grid(200, 50, 20, 5, pref = 'grid')
+g = grid.Grid(args.X, args.Y, args.xd, args.yd, pref = 'grid')
 g.generateCardinalityMatrix()
 
 
@@ -42,33 +57,28 @@ orig_params = {
             'colsample_bytree': 0.7,
             'scale_pos_weight': 1
             }
-m = 12
-n = 40
-th = 3
-
 
 
 def transform_x(X, x_transformer = None):
     """
     X = [[x, y, a, t]]
     """
-    fw = [500., 1000., 4., 3., 2., 10., 10.]
     minute_v = X[:, 3]%60
     hour_v = X[:, 3]//60
     weekday_v = hour_v//24
     month_v = weekday_v//30
-    year_v = (weekday_v//365 + 1)*fw[5]
-    hour_v = ((hour_v%24 + 1) + minute_v/60.0)*fw[2]
+    year_v = (weekday_v//365 + 1)
+    hour_v = ((hour_v%24 + 1) + minute_v/60.0)
     hour_v_2 = (X[:, 3]%(60*60*24))//(60*60*2)
     hour_v_3 = (X[:, 3]%(60*60*24))//(60*60*3)
     hour_v_4 = (X[:, 3]%(60*60*24))//(60*60*4)
     hour_v_6 = (X[:, 3]%(60*60*24))//(60*60*6)
     hour_v_8 = (X[:, 3]%(60*60*24))//(60*60*8)
-    weekday_v = (weekday_v%7 + 1)*fw[3]
-    month_v = (month_v%12 +1)*fw[4]
-    accuracy_v = np.log10(X[:, 2])*fw[6]
-    x_v = X[:, 0]*fw[0]
-    y_v = X[:, 1]*fw[1]
+    weekday_v = (weekday_v%7 + 1)
+    month_v = (month_v%12 +1)
+    accuracy_v = np.log10(X[:, 2])
+    x_v = X[:, 0]
+    y_v = X[:, 1]
     return np.hstack((x_v.reshape(-1, 1),
                      y_v.reshape(-1, 1),
                      accuracy_v.reshape(-1, 1),
@@ -125,6 +135,7 @@ def get_dtrain_enc(m, n):
     print X.shape, "X shape"
     print y.shape, "y shape"
     print len(enc['encoder'].classes_), "no of classes"
+    logger.debug("no of classes: %s" %(len(enc['encoder'].classes_)))
 
     dtrain = xgb.DMatrix(X, label=np.ravel(y))
     return (dtrain, enc)
