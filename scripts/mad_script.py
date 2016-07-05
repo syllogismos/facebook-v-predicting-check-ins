@@ -77,7 +77,7 @@ def process_one_cell(df_cell_train, df_cell_test, fw, th, n_neighbors):
         'max_delta_step': 7,
         'num_class': len(enc._classes_)
     }
-    num_round = 100
+    num_round = 40
     dtrain = xgb.DMatrix(X, label = np.ravel(y_enc))
     bst = xgb.train(params, dtrain, num_round, feval = map3eval)
     dtest = xgb.DMatrix(df_cell_test.values)
@@ -189,7 +189,7 @@ def process_grid(df_train, df_test, x_cuts, y_cuts, t_cuts,
 def generate_submission(preds):    
     print('Writing submission file')
     print('Pred shape:', preds.shape)
-    with open('KNN_submission.csv', "w") as out:
+    with open('mad_script_xgb.csv', "w") as out:
         out.write("row_id,place_id\n")
         rows = ['']*8607230
         n=0
@@ -267,7 +267,7 @@ def feature_engineering(df):
 print('Starting...')
 start_time = time.time()
 # Global variables
-datapath = '../input/'
+datapath = '../'
 # Change val_start_day to zero to generate predictions
 val_start_day = 0 # Day at which to cut validation
 th = 5 # Threshold at which to cut places from train
