@@ -205,6 +205,7 @@ def trans_y(y, y_transformer = None):
     return (new_y, y_transformer)
 
 def classifier(X, Y, params):
+    params['max_delta_step'] = 7
     num_round = 100
     dtrain = xgb.DMatrix(X, label=np.ravel(Y))
     bst = xgb.train(params, dtrain, num_round, feval = map3eval)
@@ -376,9 +377,10 @@ class XGB_Model(SklearnModel):
             'scale_pos_weight': 1,
             'nthread': 4,
             'silent': 1,
+            'max_delta_step': 7
         }
 
-        paramsFile = self.grid.getParamsFile(5, 10)
+        paramsFile = self.grid.getParamsFile(5, 1023451)
         if paramsFile == None:
             print "params file doesn't exist.. so loading default params"
             state['params_dict'] = [[default_xgb_params for n in range(self.grid.max_n + 1)]\
