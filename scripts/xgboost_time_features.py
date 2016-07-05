@@ -55,8 +55,8 @@ def train_row(i, state):
     train_preds = []
     for n in range(state['grid'].max_n + 1):
     # for n in range(1):
-        if n % 10 == 0:
-            print "processing column %s of row %s" %(n, i)
+        # if n % 10 == 0:
+        #     print "processing column %s of row %s" %(n, i)
         clf, x_transformer, y_transformer, top_t, top_t_train_places = train_single_grid_cell(i, n, state)
         if top_t_train_places != None:
             train_preds.append(top_t_train_places)
