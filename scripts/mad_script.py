@@ -75,7 +75,7 @@ def process_one_cell(df_cell_train, df_cell_test, fw, th, n_neighbors):
         'scale_pos_weight': 1,
         'silent': 1,
         'max_delta_step': 7,
-        'num_class': len(enc._classes_)
+        'num_class': len(enc.classes_)
     }
     num_round = 40
     dtrain = xgb.DMatrix(X, label = np.ravel(y_enc))
