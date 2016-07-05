@@ -271,7 +271,8 @@ datapath = '../'
 # Change val_start_day to zero to generate predictions
 val_start_day = 0 # Day at which to cut validation
 th = 5 # Threshold at which to cut places from train
-fw = [0.6, 0.32935, 0.56515, 0.2670, 22, 52, 0.51785]
+# fw = [0.6, 0.32935, 0.56515, 0.2670, 22, 52, 0.51785]
+fw = [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
 
 # Defining the size of the grid
 x_cuts = 20 # number of cuts along x 
