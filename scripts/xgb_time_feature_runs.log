@@ -1,0 +1,289 @@
+DEBUG:root:~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+DEBUG:root:Training time of parallel processing 8692.58197784
+DEBUG:root:mean precision of cross validation set: 0.682046203033
+DEBUG:root:grid_250_20_30_10_params_01_7_4_03_09_06_07_8_th7.csv
+DEBUG:root:@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+DEBUG:boto:Using access key provided by client.
+DEBUG:boto:Using secret key provided by client.
+DEBUG:boto:path=/
+DEBUG:boto:auth_path=/fb_submissions/
+DEBUG:boto:Method: HEAD
+DEBUG:boto:Path: /
+DEBUG:boto:Data: 
+DEBUG:boto:Headers: {}
+DEBUG:boto:Host: fb_submissions.s3.amazonaws.com
+DEBUG:boto:Port: 443
+DEBUG:boto:Params: {}
+DEBUG:boto:establishing HTTPS connection: host=fb_submissions.s3.amazonaws.com, kwargs={'port': 443, 'timeout': 70}
+DEBUG:boto:Token: None
+DEBUG:boto:StringToSign:
+HEAD
+
+
+Wed, 06 Jul 2016 04:33:00 GMT
+/fb_submissions/
+DEBUG:boto:Signature:
+AWS AKIAJJSFKC6WTOZOSV3A:QcZP/iiD9fmq3ByqvO81Luq9BkA=
+DEBUG:boto:Final headers: {'Date': 'Wed, 06 Jul 2016 04:33:00 GMT', 'Content-Length': '0', 'Authorization': u'AWS AKIAJJSFKC6WTOZOSV3A:QcZP/iiD9fmq3ByqvO81Luq9BkA=', 'User-Agent': 'Boto/2.41.0 Python/2.7.6 Linux/3.13.0-74-generic'}
+DEBUG:boto:Response headers: [('x-amz-bucket-region', 'us-east-1'), ('x-amz-id-2', 'F25Lhj94CkwCmcn/hWhvuaFq+nB0k7W/+qEOLvBjApNejPVR+0JDkvhpXUDdpeJt75Yhqa0QoY0='), ('server', 'AmazonS3'), ('transfer-encoding', 'chunked'), ('x-amz-request-id', '755523DE9C67FE80'), ('date', 'Wed, 06 Jul 2016 04:33:02 GMT'), ('content-type', 'application/xml')]
+DEBUG:boto:path=/2016-07-06%2004%3A33%3A00%20grid_250_20_30_10_params_01_7_4_03_09_06_07_8_th7.csv.zip
+DEBUG:boto:auth_path=/fb_submissions/2016-07-06%2004%3A33%3A00%20grid_250_20_30_10_params_01_7_4_03_09_06_07_8_th7.csv.zip
+DEBUG:boto:Method: PUT
+DEBUG:boto:Path: /2016-07-06%2004%3A33%3A00%20grid_250_20_30_10_params_01_7_4_03_09_06_07_8_th7.csv.zip
+DEBUG:boto:Data: 
+DEBUG:boto:Headers: {'Content-Length': '164130906', 'Content-MD5': u'aKt3MKMKzUE7ukz/USNSvw==', 'Content-Type': 'application/zip', 'Expect': '100-Continue', 'User-Agent': 'Boto/2.41.0 Python/2.7.6 Linux/3.13.0-74-generic'}
+DEBUG:boto:Host: fb_submissions.s3.amazonaws.com
+DEBUG:boto:Port: 443
+DEBUG:boto:Params: {}
+DEBUG:boto:Token: None
+DEBUG:boto:StringToSign:
+PUT
+aKt3MKMKzUE7ukz/USNSvw==
+application/zip
+Wed, 06 Jul 2016 04:33:01 GMT
+/fb_submissions/2016-07-06%2004%3A33%3A00%20grid_250_20_30_10_params_01_7_4_03_09_06_07_8_th7.csv.zip
+DEBUG:boto:Signature:
+AWS AKIAJJSFKC6WTOZOSV3A:aVDIbT2s7+lVOng8hYqjd9huoLI=
+DEBUG:boto:Final headers: {'Content-Length': '164130906', 'Content-MD5': 'aKt3MKMKzUE7ukz/USNSvw==', 'Expect': '100-Continue', 'Date': 'Wed, 06 Jul 2016 04:33:01 GMT', 'User-Agent': 'Boto/2.41.0 Python/2.7.6 Linux/3.13.0-74-generic', 'Content-Type': 'application/zip', 'Authorization': u'AWS AKIAJJSFKC6WTOZOSV3A:aVDIbT2s7+lVOng8hYqjd9huoLI='}
+DEBUG:boto:Response headers: [('content-length', '0'), ('x-amz-id-2', 'Ols354rrhJWOkjXlqNpJYAsHWaHQdeEtk3/erWFnl/di+SNEsdjelJEZ0JbODLX+Wb4Unp9+xzg='), ('server', 'AmazonS3'), ('x-amz-request-id', '192B45357F3ED9E4'), ('etag', '"68ab7730a30acd413bba4cff512352bf"'), ('date', 'Wed, 06 Jul 2016 04:33:03 GMT')]
+DEBUG:root:~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+DEBUG:root:Training time of parallel processing 7628.39264488
+DEBUG:root:mean precision of cross validation set: 0.681770182832
+DEBUG:root:grid_250_20_30_10_params_01_7_4_03_09_06_07_8_th10.csv
+DEBUG:root:@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+DEBUG:boto:Using access key provided by client.
+DEBUG:boto:Using secret key provided by client.
+DEBUG:boto:path=/
+DEBUG:boto:auth_path=/fb_submissions/
+DEBUG:boto:Method: HEAD
+DEBUG:boto:Path: /
+DEBUG:boto:Data: 
+DEBUG:boto:Headers: {}
+DEBUG:boto:Host: fb_submissions.s3.amazonaws.com
+DEBUG:boto:Port: 443
+DEBUG:boto:Params: {}
+DEBUG:boto:establishing HTTPS connection: host=fb_submissions.s3.amazonaws.com, kwargs={'port': 443, 'timeout': 70}
+DEBUG:boto:Token: None
+DEBUG:boto:StringToSign:
+HEAD
+
+
+Wed, 06 Jul 2016 06:43:20 GMT
+/fb_submissions/
+DEBUG:boto:Signature:
+AWS AKIAJJSFKC6WTOZOSV3A:hNJz2EZ4hbma/dKiIvq69lL4zbI=
+DEBUG:boto:Final headers: {'Date': 'Wed, 06 Jul 2016 06:43:20 GMT', 'Content-Length': '0', 'Authorization': u'AWS AKIAJJSFKC6WTOZOSV3A:hNJz2EZ4hbma/dKiIvq69lL4zbI=', 'User-Agent': 'Boto/2.41.0 Python/2.7.6 Linux/3.13.0-74-generic'}
+DEBUG:boto:Response headers: [('x-amz-bucket-region', 'us-east-1'), ('x-amz-id-2', 'BELVw0c6OvPTTwoyysSRu+oJbzG/uFeKcLDH7+oPIRE6ajIFfvpu76qsZzbnhhSQCpIKbBIfBug='), ('server', 'AmazonS3'), ('transfer-encoding', 'chunked'), ('x-amz-request-id', '7BC9690AB804E34D'), ('date', 'Wed, 06 Jul 2016 06:43:22 GMT'), ('content-type', 'application/xml')]
+DEBUG:boto:path=/2016-07-06%2006%3A43%3A20%20grid_250_20_30_10_params_01_7_4_03_09_06_07_8_th10.csv.zip
+DEBUG:boto:auth_path=/fb_submissions/2016-07-06%2006%3A43%3A20%20grid_250_20_30_10_params_01_7_4_03_09_06_07_8_th10.csv.zip
+DEBUG:boto:Method: PUT
+DEBUG:boto:Path: /2016-07-06%2006%3A43%3A20%20grid_250_20_30_10_params_01_7_4_03_09_06_07_8_th10.csv.zip
+DEBUG:boto:Data: 
+DEBUG:boto:Headers: {'Content-Length': '164122632', 'Content-MD5': u'VO7w1hy44deFgeno8WuT8g==', 'Content-Type': 'application/zip', 'Expect': '100-Continue', 'User-Agent': 'Boto/2.41.0 Python/2.7.6 Linux/3.13.0-74-generic'}
+DEBUG:boto:Host: fb_submissions.s3.amazonaws.com
+DEBUG:boto:Port: 443
+DEBUG:boto:Params: {}
+DEBUG:boto:Token: None
+DEBUG:boto:StringToSign:
+PUT
+VO7w1hy44deFgeno8WuT8g==
+application/zip
+Wed, 06 Jul 2016 06:43:20 GMT
+/fb_submissions/2016-07-06%2006%3A43%3A20%20grid_250_20_30_10_params_01_7_4_03_09_06_07_8_th10.csv.zip
+DEBUG:boto:Signature:
+AWS AKIAJJSFKC6WTOZOSV3A:NJBUP994wnyQEnYGAUVKhR2Ke+I=
+DEBUG:boto:Final headers: {'Content-Length': '164122632', 'Content-MD5': 'VO7w1hy44deFgeno8WuT8g==', 'Expect': '100-Continue', 'Date': 'Wed, 06 Jul 2016 06:43:20 GMT', 'User-Agent': 'Boto/2.41.0 Python/2.7.6 Linux/3.13.0-74-generic', 'Content-Type': 'application/zip', 'Authorization': u'AWS AKIAJJSFKC6WTOZOSV3A:NJBUP994wnyQEnYGAUVKhR2Ke+I='}
+DEBUG:boto:Response headers: [('content-length', '0'), ('x-amz-id-2', 'TNd89zSgG2Tvf36hZXohxef9dpDtn/aNHFYWdcuj1hEJIaPYFKXQ2sHihTwa19zRKeprFnEma0g='), ('server', 'AmazonS3'), ('x-amz-request-id', '94FB027F496CFF12'), ('etag', '"54eef0d61cb8e1d78581e9e8f16b93f2"'), ('date', 'Wed, 06 Jul 2016 06:43:22 GMT')]
+DEBUG:root:~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+DEBUG:root:Training time of parallel processing 8427.84564304
+DEBUG:root:mean precision of cross validation set: 0.681307190441
+DEBUG:root:grid_200_20_30_10_params_01_7_4_01_085_065_06_6_th7.csv
+DEBUG:root:@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+DEBUG:boto:Using access key provided by client.
+DEBUG:boto:Using secret key provided by client.
+DEBUG:boto:path=/
+DEBUG:boto:auth_path=/fb_submissions/
+DEBUG:boto:Method: HEAD
+DEBUG:boto:Path: /
+DEBUG:boto:Data: 
+DEBUG:boto:Headers: {}
+DEBUG:boto:Host: fb_submissions.s3.amazonaws.com
+DEBUG:boto:Port: 443
+DEBUG:boto:Params: {}
+DEBUG:boto:establishing HTTPS connection: host=fb_submissions.s3.amazonaws.com, kwargs={'port': 443, 'timeout': 70}
+DEBUG:boto:Token: None
+DEBUG:boto:StringToSign:
+HEAD
+
+
+Wed, 06 Jul 2016 09:06:58 GMT
+/fb_submissions/
+DEBUG:boto:Signature:
+AWS AKIAJJSFKC6WTOZOSV3A:Qw7rXtqdsH9c8ys9hrJ0uNZa8Qw=
+DEBUG:boto:Final headers: {'Date': 'Wed, 06 Jul 2016 09:06:58 GMT', 'Content-Length': '0', 'Authorization': u'AWS AKIAJJSFKC6WTOZOSV3A:Qw7rXtqdsH9c8ys9hrJ0uNZa8Qw=', 'User-Agent': 'Boto/2.41.0 Python/2.7.6 Linux/3.13.0-74-generic'}
+DEBUG:boto:Response headers: [('x-amz-bucket-region', 'us-east-1'), ('x-amz-id-2', 'sXp55+3Fbl4EpNFEAxk2ln6FWBsUdtl6GJBTqvT2wDY0PUlSxeShZYQRFx1Rjkfb0aWq0Xsx5vA='), ('server', 'AmazonS3'), ('transfer-encoding', 'chunked'), ('x-amz-request-id', 'A342221291EB9DCB'), ('date', 'Wed, 06 Jul 2016 09:07:00 GMT'), ('content-type', 'application/xml')]
+DEBUG:boto:path=/2016-07-06%2009%3A06%3A58%20grid_200_20_30_10_params_01_7_4_01_085_065_06_6_th7.csv.zip
+DEBUG:boto:auth_path=/fb_submissions/2016-07-06%2009%3A06%3A58%20grid_200_20_30_10_params_01_7_4_01_085_065_06_6_th7.csv.zip
+DEBUG:boto:Method: PUT
+DEBUG:boto:Path: /2016-07-06%2009%3A06%3A58%20grid_200_20_30_10_params_01_7_4_01_085_065_06_6_th7.csv.zip
+DEBUG:boto:Data: 
+DEBUG:boto:Headers: {'Content-Length': '164111533', 'Content-MD5': u'3qIcnydvd+i3+6SNg0XD1Q==', 'Content-Type': 'application/zip', 'Expect': '100-Continue', 'User-Agent': 'Boto/2.41.0 Python/2.7.6 Linux/3.13.0-74-generic'}
+DEBUG:boto:Host: fb_submissions.s3.amazonaws.com
+DEBUG:boto:Port: 443
+DEBUG:boto:Params: {}
+DEBUG:boto:Token: None
+DEBUG:boto:StringToSign:
+PUT
+3qIcnydvd+i3+6SNg0XD1Q==
+application/zip
+Wed, 06 Jul 2016 09:06:58 GMT
+/fb_submissions/2016-07-06%2009%3A06%3A58%20grid_200_20_30_10_params_01_7_4_01_085_065_06_6_th7.csv.zip
+DEBUG:boto:Signature:
+AWS AKIAJJSFKC6WTOZOSV3A:EoAHXqtrZwjTflMdVJgfZnaupus=
+DEBUG:boto:Final headers: {'Content-Length': '164111533', 'Content-MD5': '3qIcnydvd+i3+6SNg0XD1Q==', 'Expect': '100-Continue', 'Date': 'Wed, 06 Jul 2016 09:06:58 GMT', 'User-Agent': 'Boto/2.41.0 Python/2.7.6 Linux/3.13.0-74-generic', 'Content-Type': 'application/zip', 'Authorization': u'AWS AKIAJJSFKC6WTOZOSV3A:EoAHXqtrZwjTflMdVJgfZnaupus='}
+DEBUG:boto:Response headers: [('content-length', '0'), ('x-amz-id-2', 'ZFEfHs5Ka9mPUnrj3Jv4vD6laQbcLrfttSRn5NNFN1RYTujvKHcweVxna0D6f+1Tcxmzvea5yFU='), ('server', 'AmazonS3'), ('x-amz-request-id', 'D1103EAD50C79E51'), ('etag', '"dea21c9f276f77e8b7fba48d8345c3d5"'), ('date', 'Wed, 06 Jul 2016 09:07:00 GMT')]
+DEBUG:root:~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+DEBUG:root:Training time of parallel processing 7114.45248294
+DEBUG:root:mean precision of cross validation set: 0.68068156374
+DEBUG:root:grid_200_20_30_10_params_01_7_4_01_085_065_06_6_th10.csv
+DEBUG:root:@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+DEBUG:boto:Using access key provided by client.
+DEBUG:boto:Using secret key provided by client.
+DEBUG:boto:path=/
+DEBUG:boto:auth_path=/fb_submissions/
+DEBUG:boto:Method: HEAD
+DEBUG:boto:Path: /
+DEBUG:boto:Data: 
+DEBUG:boto:Headers: {}
+DEBUG:boto:Host: fb_submissions.s3.amazonaws.com
+DEBUG:boto:Port: 443
+DEBUG:boto:Params: {}
+DEBUG:boto:establishing HTTPS connection: host=fb_submissions.s3.amazonaws.com, kwargs={'port': 443, 'timeout': 70}
+DEBUG:boto:Token: None
+DEBUG:boto:StringToSign:
+HEAD
+
+
+Wed, 06 Jul 2016 11:08:41 GMT
+/fb_submissions/
+DEBUG:boto:Signature:
+AWS AKIAJJSFKC6WTOZOSV3A:d1Y9pOxkL/uyARkvaNUOtSVhKBA=
+DEBUG:boto:Final headers: {'Date': 'Wed, 06 Jul 2016 11:08:41 GMT', 'Content-Length': '0', 'Authorization': u'AWS AKIAJJSFKC6WTOZOSV3A:d1Y9pOxkL/uyARkvaNUOtSVhKBA=', 'User-Agent': 'Boto/2.41.0 Python/2.7.6 Linux/3.13.0-74-generic'}
+DEBUG:boto:Response headers: [('x-amz-bucket-region', 'us-east-1'), ('x-amz-id-2', 'Gxq1o8oqxLY+DL0f0egWzpOwc4OGYtiOKK+6MVkBHThigeATmE3lyiQiVsasf+4iEA2mlZRXmZY='), ('server', 'AmazonS3'), ('transfer-encoding', 'chunked'), ('x-amz-request-id', 'C1196BD6ABD30912'), ('date', 'Wed, 06 Jul 2016 11:08:43 GMT'), ('content-type', 'application/xml')]
+DEBUG:boto:path=/2016-07-06%2011%3A08%3A41%20grid_200_20_30_10_params_01_7_4_01_085_065_06_6_th10.csv.zip
+DEBUG:boto:auth_path=/fb_submissions/2016-07-06%2011%3A08%3A41%20grid_200_20_30_10_params_01_7_4_01_085_065_06_6_th10.csv.zip
+DEBUG:boto:Method: PUT
+DEBUG:boto:Path: /2016-07-06%2011%3A08%3A41%20grid_200_20_30_10_params_01_7_4_01_085_065_06_6_th10.csv.zip
+DEBUG:boto:Data: 
+DEBUG:boto:Headers: {'Content-Length': '164101472', 'Content-MD5': u'zwGx7XdiEnvRhqBvzN8tBw==', 'Content-Type': 'application/zip', 'Expect': '100-Continue', 'User-Agent': 'Boto/2.41.0 Python/2.7.6 Linux/3.13.0-74-generic'}
+DEBUG:boto:Host: fb_submissions.s3.amazonaws.com
+DEBUG:boto:Port: 443
+DEBUG:boto:Params: {}
+DEBUG:boto:Token: None
+DEBUG:boto:StringToSign:
+PUT
+zwGx7XdiEnvRhqBvzN8tBw==
+application/zip
+Wed, 06 Jul 2016 11:08:42 GMT
+/fb_submissions/2016-07-06%2011%3A08%3A41%20grid_200_20_30_10_params_01_7_4_01_085_065_06_6_th10.csv.zip
+DEBUG:boto:Signature:
+AWS AKIAJJSFKC6WTOZOSV3A:vzgZG9l3QrQ3nVrkOXhEPAqUGzk=
+DEBUG:boto:Final headers: {'Content-Length': '164101472', 'Content-MD5': 'zwGx7XdiEnvRhqBvzN8tBw==', 'Expect': '100-Continue', 'Date': 'Wed, 06 Jul 2016 11:08:42 GMT', 'User-Agent': 'Boto/2.41.0 Python/2.7.6 Linux/3.13.0-74-generic', 'Content-Type': 'application/zip', 'Authorization': u'AWS AKIAJJSFKC6WTOZOSV3A:vzgZG9l3QrQ3nVrkOXhEPAqUGzk='}
+DEBUG:boto:Response headers: [('content-length', '0'), ('x-amz-id-2', 'KnMBCCvrCugXwFV82sI9pDeN1jnN7olDT9bHiUDIxUK1lVmDsnyW4p6bKcc8qUF1olUZub0N4z8='), ('server', 'AmazonS3'), ('x-amz-request-id', 'AEE0C1920E4DAC94'), ('etag', '"cf01b1ed7762127bd186a06fccdf2d07"'), ('date', 'Wed, 06 Jul 2016 11:08:44 GMT')]
+DEBUG:root:~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+DEBUG:root:Training time of parallel processing 5302.11213303
+DEBUG:root:mean precision of cross validation set: 0.680660948124
+DEBUG:root:grid_200_50_20_5_params_01_5_4_01_085_065_08_6_th8.csv
+DEBUG:root:@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+DEBUG:boto:Using access key provided by client.
+DEBUG:boto:Using secret key provided by client.
+DEBUG:boto:path=/
+DEBUG:boto:auth_path=/fb_submissions/
+DEBUG:boto:Method: HEAD
+DEBUG:boto:Path: /
+DEBUG:boto:Data: 
+DEBUG:boto:Headers: {}
+DEBUG:boto:Host: fb_submissions.s3.amazonaws.com
+DEBUG:boto:Port: 443
+DEBUG:boto:Params: {}
+DEBUG:boto:establishing HTTPS connection: host=fb_submissions.s3.amazonaws.com, kwargs={'port': 443, 'timeout': 70}
+DEBUG:boto:Token: None
+DEBUG:boto:StringToSign:
+HEAD
+
+
+Wed, 06 Jul 2016 12:40:07 GMT
+/fb_submissions/
+DEBUG:boto:Signature:
+AWS AKIAJJSFKC6WTOZOSV3A:XV3tXgzBfoNlFe+Xq0fruf149HI=
+DEBUG:boto:Final headers: {'Date': 'Wed, 06 Jul 2016 12:40:07 GMT', 'Content-Length': '0', 'Authorization': u'AWS AKIAJJSFKC6WTOZOSV3A:XV3tXgzBfoNlFe+Xq0fruf149HI=', 'User-Agent': 'Boto/2.41.0 Python/2.7.6 Linux/3.13.0-74-generic'}
+DEBUG:boto:Response headers: [('x-amz-bucket-region', 'us-east-1'), ('x-amz-id-2', 'aKKtc68HXqitmE8ifbw7sXrENSMs22XWBTgCmeQ/YGqHg+QlT8FnSLNXayEXtl0+L0DZEr62Ijw='), ('server', 'AmazonS3'), ('transfer-encoding', 'chunked'), ('x-amz-request-id', '1FB6ED524C8B3E98'), ('date', 'Wed, 06 Jul 2016 12:40:09 GMT'), ('content-type', 'application/xml')]
+DEBUG:boto:path=/2016-07-06%2012%3A40%3A07%20grid_200_50_20_5_params_01_5_4_01_085_065_08_6_th8.csv.zip
+DEBUG:boto:auth_path=/fb_submissions/2016-07-06%2012%3A40%3A07%20grid_200_50_20_5_params_01_5_4_01_085_065_08_6_th8.csv.zip
+DEBUG:boto:Method: PUT
+DEBUG:boto:Path: /2016-07-06%2012%3A40%3A07%20grid_200_50_20_5_params_01_5_4_01_085_065_08_6_th8.csv.zip
+DEBUG:boto:Data: 
+DEBUG:boto:Headers: {'Content-Length': '164089261', 'Content-MD5': u'd79DzlIhL75VROjHpBOzzA==', 'Content-Type': 'application/zip', 'Expect': '100-Continue', 'User-Agent': 'Boto/2.41.0 Python/2.7.6 Linux/3.13.0-74-generic'}
+DEBUG:boto:Host: fb_submissions.s3.amazonaws.com
+DEBUG:boto:Port: 443
+DEBUG:boto:Params: {}
+DEBUG:boto:Token: None
+DEBUG:boto:StringToSign:
+PUT
+d79DzlIhL75VROjHpBOzzA==
+application/zip
+Wed, 06 Jul 2016 12:40:07 GMT
+/fb_submissions/2016-07-06%2012%3A40%3A07%20grid_200_50_20_5_params_01_5_4_01_085_065_08_6_th8.csv.zip
+DEBUG:boto:Signature:
+AWS AKIAJJSFKC6WTOZOSV3A:bDYhCRrWu9cQG+I5Ss7+UsvEhTg=
+DEBUG:boto:Final headers: {'Content-Length': '164089261', 'Content-MD5': 'd79DzlIhL75VROjHpBOzzA==', 'Expect': '100-Continue', 'Date': 'Wed, 06 Jul 2016 12:40:07 GMT', 'User-Agent': 'Boto/2.41.0 Python/2.7.6 Linux/3.13.0-74-generic', 'Content-Type': 'application/zip', 'Authorization': u'AWS AKIAJJSFKC6WTOZOSV3A:bDYhCRrWu9cQG+I5Ss7+UsvEhTg='}
+DEBUG:boto:Response headers: [('content-length', '0'), ('x-amz-id-2', 'QOL/n85A+RnJvNt8jBf7OBeCiYRd7fCfv1oSh/6mFZXJUheHWHP+lda2ah7SpORIvmFgLKF67Eg='), ('server', 'AmazonS3'), ('x-amz-request-id', '6351D2F1B7B80CEB'), ('etag', '"77bf43ce52212fbe5544e8c7a413b3cc"'), ('date', 'Wed, 06 Jul 2016 12:40:09 GMT')]
+DEBUG:root:~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+DEBUG:root:Training time of parallel processing 8820.33991289
+DEBUG:root:mean precision of cross validation set: 0.675056363669
+DEBUG:root:grid_200_20_30_10_params_01_5_4_03_09_07_09_6_th7.csv
+DEBUG:root:@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+DEBUG:boto:Using access key provided by client.
+DEBUG:boto:Using secret key provided by client.
+DEBUG:boto:path=/
+DEBUG:boto:auth_path=/fb_submissions/
+DEBUG:boto:Method: HEAD
+DEBUG:boto:Path: /
+DEBUG:boto:Data: 
+DEBUG:boto:Headers: {}
+DEBUG:boto:Host: fb_submissions.s3.amazonaws.com
+DEBUG:boto:Port: 443
+DEBUG:boto:Params: {}
+DEBUG:boto:establishing HTTPS connection: host=fb_submissions.s3.amazonaws.com, kwargs={'port': 443, 'timeout': 70}
+DEBUG:boto:Token: None
+DEBUG:boto:StringToSign:
+HEAD
+
+
+Wed, 06 Jul 2016 18:34:28 GMT
+/fb_submissions/
+DEBUG:boto:Signature:
+AWS AKIAJJSFKC6WTOZOSV3A:/4WJBXty6ZudDMgncNst+GcxPyQ=
+DEBUG:boto:Final headers: {'Date': 'Wed, 06 Jul 2016 18:34:28 GMT', 'Content-Length': '0', 'Authorization': u'AWS AKIAJJSFKC6WTOZOSV3A:/4WJBXty6ZudDMgncNst+GcxPyQ=', 'User-Agent': 'Boto/2.41.0 Python/2.7.6 Linux/3.13.0-74-generic'}
+DEBUG:boto:Response headers: [('x-amz-bucket-region', 'us-east-1'), ('x-amz-id-2', 'YB6ezMtTmhcdXXB5FUj/xrMglF8lwRj1UCmXC4X5U4lGTf1F/NT3gi5+wDZCI8llO5UtUSSHwLg='), ('server', 'AmazonS3'), ('transfer-encoding', 'chunked'), ('x-amz-request-id', 'C4EA89F78F43CD31'), ('date', 'Wed, 06 Jul 2016 18:34:30 GMT'), ('content-type', 'application/xml')]
+DEBUG:boto:path=/2016-07-06%2018%3A34%3A28%20grid_200_20_30_10_params_01_5_4_03_09_07_09_6_th7.csv.zip
+DEBUG:boto:auth_path=/fb_submissions/2016-07-06%2018%3A34%3A28%20grid_200_20_30_10_params_01_5_4_03_09_07_09_6_th7.csv.zip
+DEBUG:boto:Method: PUT
+DEBUG:boto:Path: /2016-07-06%2018%3A34%3A28%20grid_200_20_30_10_params_01_5_4_03_09_07_09_6_th7.csv.zip
+DEBUG:boto:Data: 
+DEBUG:boto:Headers: {'Content-Length': '164000725', 'Content-MD5': u'eyQIJuAPyY8DWj4R3/5+Fg==', 'Content-Type': 'application/zip', 'Expect': '100-Continue', 'User-Agent': 'Boto/2.41.0 Python/2.7.6 Linux/3.13.0-74-generic'}
+DEBUG:boto:Host: fb_submissions.s3.amazonaws.com
+DEBUG:boto:Port: 443
+DEBUG:boto:Params: {}
+DEBUG:boto:Token: None
+DEBUG:boto:StringToSign:
+PUT
+eyQIJuAPyY8DWj4R3/5+Fg==
+application/zip
+Wed, 06 Jul 2016 18:34:28 GMT
+/fb_submissions/2016-07-06%2018%3A34%3A28%20grid_200_20_30_10_params_01_5_4_03_09_07_09_6_th7.csv.zip
+DEBUG:boto:Signature:
+AWS AKIAJJSFKC6WTOZOSV3A:d0q00VRNHgqnM8IdwRENAJPaxUU=
+DEBUG:boto:Final headers: {'Content-Length': '164000725', 'Content-MD5': 'eyQIJuAPyY8DWj4R3/5+Fg==', 'Expect': '100-Continue', 'Date': 'Wed, 06 Jul 2016 18:34:28 GMT', 'User-Agent': 'Boto/2.41.0 Python/2.7.6 Linux/3.13.0-74-generic', 'Content-Type': 'application/zip', 'Authorization': u'AWS AKIAJJSFKC6WTOZOSV3A:d0q00VRNHgqnM8IdwRENAJPaxUU='}
+DEBUG:boto:Response headers: [('content-length', '0'), ('x-amz-id-2', '29S6ePTKhA1qGQvOMUa09QhIftmLWWPK2T+k6dFRejTKkUQe59kHVah4stT4AByffhqOl9K2g4w='), ('server', 'AmazonS3'), ('x-amz-request-id', '5374555698A8112A'), ('etag', '"7b240826e00fc98f035a3e11dffe7e16"'), ('date', 'Wed, 06 Jul 2016 18:34:31 GMT')]
+DEBUG:root:~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

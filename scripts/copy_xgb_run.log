@@ -1,0 +1,30 @@
+DEBUG:root:~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+DEBUG:root:Training time of parallel processing 8692.58197784
+DEBUG:root:mean precision of cross validation set: 0.682046203033
+DEBUG:root:grid_250_20_30_10_params_01_7_4_03_09_06_07_8_th7.csv
+DEBUG:root:@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+
+DEBUG:root:~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+DEBUG:root:Training time of parallel processing 7628.39264488
+DEBUG:root:mean precision of cross validation set: 0.681770182832
+DEBUG:root:grid_250_20_30_10_params_01_7_4_03_09_06_07_8_th10.csv
+DEBUG:root:@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+
+DEBUG:root:~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+DEBUG:root:Training time of parallel processing 8427.84564304
+DEBUG:root:mean precision of cross validation set: 0.681307190441
+DEBUG:root:grid_200_20_30_10_params_01_7_4_01_085_065_06_6_th7.csv
+DEBUG:root:@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+
+DEBUG:root:~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+DEBUG:root:Training time of parallel processing 7114.45248294
+DEBUG:root:mean precision of cross validation set: 0.68068156374
+DEBUG:root:grid_200_20_30_10_params_01_7_4_01_085_065_06_6_th10.csv
+DEBUG:root:@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+
+DEBUG:root:~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+DEBUG:root:Training time of parallel processing 5302.11213303
+DEBUG:root:mean precision of cross validation set: 0.680660948124
+DEBUG:root:grid_200_50_20_5_params_01_5_4_01_085_065_08_6_th8.csv
+DEBUG:root:@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+

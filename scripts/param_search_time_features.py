@@ -24,7 +24,7 @@ import grid_generation as grid
 
 
 import logging
-logging.basicConfig(filename='param_search_time_feature.log',level=logging.DEBUG)
+logging.basicConfig(filename='param_search_time_feature12.log',level=logging.DEBUG)
 
 import argparse
 parser = argparse.ArgumentParser()

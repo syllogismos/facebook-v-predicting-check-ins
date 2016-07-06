@@ -1,0 +1,96 @@
+DEBUG:root:@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+DEBUG:root:no of classes: 40
+DEBUG:root:top map results
+DEBUG:root:[{'map': 0.65659800000000001, 'max_depth': 6, 'min_child_weight': 4}, {'map': 0.6565979999999999, 'max_depth': 8, 'min_child_weight': 4}, {'map': 0.65659766666666675, 'max_depth': 9, 'min_child_weight': 4}]
+DEBUG:root:best params so far
+DEBUG:root:{'colsample_bytree': 0.7, 'silent': 1, 'scale_pos_weight': 1, 'nthread': 4, 'min_child_weight': 4, 'subsample': 0.9, 'eta': 0.1, 'objective': 'multi:softprob', 'max_depth': 6, 'gamma': 0.32}
+DEBUG:root:top map results
+DEBUG:root:[{'map': 0.66030733333333336, 'gamma': 0.4, 'colsample_bylevel': 0.6}, {'map': 0.66030733333333336, 'gamma': 0.4, 'colsample_bylevel': 0.7}, {'map': 0.65977766666666671, 'gamma': 0.4, 'colsample_bylevel': 0.9}]
+DEBUG:root:best params so far
+DEBUG:root:{'colsample_bytree': 0.7, 'silent': 1, 'colsample_bylevel': 0.6, 'scale_pos_weight': 1, 'nthread': 4, 'min_child_weight': 4, 'subsample': 0.9, 'eta': 0.1, 'objective': 'multi:softprob', 'max_depth': 6, 'gamma': 0.4}
+DEBUG:root:top map results
+DEBUG:root:[{'map': 0.66030733333333336, 'max_delta_step': 14}, {'map': 0.65871766666666665, 'max_delta_step': 13}, {'map': 0.6576576666666667, 'max_delta_step': 8}]
+DEBUG:root:best params so far
+DEBUG:root:{'colsample_bytree': 0.7, 'silent': 1, 'colsample_bylevel': 0.6, 'scale_pos_weight': 1, 'max_delta_step': 14, 'nthread': 4, 'min_child_weight': 4, 'subsample': 0.9, 'eta': 0.1, 'objective': 'multi:softprob', 'max_depth': 6, 'gamma': 0.4}
+DEBUG:root:top map results
+DEBUG:root:[{'subsample': 0.95, 'colsample_bytree': 0.6, 'map': 0.66030766666666663}, {'subsample': 0.9, 'colsample_bytree': 0.65, 'map': 0.66030733333333336}, {'subsample': 0.9, 'colsample_bytree': 0.7, 'map': 0.66030733333333336}]
+DEBUG:root:best params so far
+DEBUG:root:{'colsample_bytree': 0.6, 'silent': 1, 'colsample_bylevel': 0.6, 'scale_pos_weight': 1, 'max_delta_step': 14, 'nthread': 4, 'min_child_weight': 4, 'subsample': 0.95, 'eta': 0.1, 'objective': 'multi:softprob', 'max_depth': 6, 'gamma': 0.4}
+DEBUG:root:~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+DEBUG:root:best params for the grid 250, 20, 30, 10
+DEBUG:root:grid no m, n 25, 120
+DEBUG:root:threshold: 10
+DEBUG:root:{'colsample_bytree': 0.6, 'silent': 1, 'colsample_bylevel': 0.6, 'scale_pos_weight': 1, 'max_delta_step': 14, 'nthread': 4, 'min_child_weight': 4, 'subsample': 0.95, 'eta': 0.1, 'objective': 'multi:softprob', 'max_depth': 6, 'gamma': 0.4}
+DEBUG:root:###################################################
+DEBUG:root:@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+DEBUG:root:no of classes: 40
+DEBUG:root:top map results
+DEBUG:root:[{'map': 0.72880866666666666, 'max_depth': 7, 'min_child_weight': 4}, {'map': 0.72850700000000002, 'max_depth': 7, 'min_child_weight': 2}, {'map': 0.72850700000000002, 'max_depth': 8, 'min_child_weight': 4}]
+DEBUG:root:best params so far
+DEBUG:root:{'colsample_bytree': 0.7, 'silent': 1, 'scale_pos_weight': 1, 'nthread': 4, 'min_child_weight': 4, 'subsample': 0.9, 'eta': 0.1, 'objective': 'multi:softprob', 'max_depth': 7, 'gamma': 0.32}
+DEBUG:root:top map results
+DEBUG:root:[{'map': 0.73061866666666664, 'gamma': 0.0, 'colsample_bylevel': 0.8}, {'map': 0.73061866666666664, 'gamma': 0.4, 'colsample_bylevel': 0.6}, {'map': 0.73061866666666664, 'gamma': 0.4, 'colsample_bylevel': 0.7}]
+DEBUG:root:best params so far
+DEBUG:root:{'colsample_bytree': 0.7, 'silent': 1, 'colsample_bylevel': 0.8, 'scale_pos_weight': 1, 'nthread': 4, 'min_child_weight': 4, 'subsample': 0.9, 'eta': 0.1, 'objective': 'multi:softprob', 'max_depth': 7, 'gamma': 0.0}
+DEBUG:root:top map results
+DEBUG:root:[{'map': 0.73001533333333335, 'max_delta_step': 6}, {'map': 0.73001533333333335, 'max_delta_step': 8}, {'map': 0.73001533333333324, 'max_delta_step': 3}]
+DEBUG:root:best params so far
+DEBUG:root:{'colsample_bytree': 0.7, 'silent': 1, 'colsample_bylevel': 0.8, 'scale_pos_weight': 1, 'max_delta_step': 6, 'nthread': 4, 'min_child_weight': 4, 'subsample': 0.9, 'eta': 0.1, 'objective': 'multi:softprob', 'max_depth': 7, 'gamma': 0.0}
+DEBUG:root:top map results
+DEBUG:root:[{'subsample': 0.8, 'colsample_bytree': 0.65, 'map': 0.73393700000000006}, {'subsample': 0.8, 'colsample_bytree': 0.7, 'map': 0.73393700000000006}, {'subsample': 0.65, 'colsample_bytree': 0.95, 'map': 0.73092033333333328}]
+DEBUG:root:best params so far
+DEBUG:root:{'colsample_bytree': 0.65, 'silent': 1, 'colsample_bylevel': 0.8, 'scale_pos_weight': 1, 'max_delta_step': 6, 'nthread': 4, 'min_child_weight': 4, 'subsample': 0.8, 'eta': 0.1, 'objective': 'multi:softprob', 'max_depth': 7, 'gamma': 0.0}
+DEBUG:root:~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+DEBUG:root:best params for the grid 250, 20, 30, 10
+DEBUG:root:grid no m, n 36, 92
+DEBUG:root:threshold: 10
+DEBUG:root:{'colsample_bytree': 0.65, 'silent': 1, 'colsample_bylevel': 0.8, 'scale_pos_weight': 1, 'max_delta_step': 6, 'nthread': 4, 'min_child_weight': 4, 'subsample': 0.8, 'eta': 0.1, 'objective': 'multi:softprob', 'max_depth': 7, 'gamma': 0.0}
+DEBUG:root:###################################################
+DEBUG:root:@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+DEBUG:root:no of classes: 33
+DEBUG:root:top map results
+DEBUG:root:[{'map': 0.75988299999999998, 'max_depth': 7, 'min_child_weight': 3}, {'map': 0.7596586666666667, 'max_depth': 6, 'min_child_weight': 3}, {'map': 0.75943400000000005, 'max_depth': 5, 'min_child_weight': 2}]
+DEBUG:root:best params so far
+DEBUG:root:{'colsample_bytree': 0.7, 'silent': 1, 'scale_pos_weight': 1, 'nthread': 4, 'min_child_weight': 3, 'subsample': 0.9, 'eta': 0.1, 'objective': 'multi:softprob', 'max_depth': 7, 'gamma': 0.32}
+DEBUG:root:top map results
+DEBUG:root:[{'map': 0.76010800000000012, 'gamma': 0.1, 'colsample_bylevel': 0.6}, {'map': 0.76010800000000012, 'gamma': 0.1, 'colsample_bylevel': 0.7}, {'map': 0.76010800000000012, 'gamma': 0.5, 'colsample_bylevel': 0.5}]
+DEBUG:root:best params so far
+DEBUG:root:{'colsample_bytree': 0.7, 'silent': 1, 'colsample_bylevel': 0.6, 'scale_pos_weight': 1, 'nthread': 4, 'min_child_weight': 3, 'subsample': 0.9, 'eta': 0.1, 'objective': 'multi:softprob', 'max_depth': 7, 'gamma': 0.1}
+DEBUG:root:top map results
+DEBUG:root:[{'map': 0.76235399999999987, 'max_delta_step': 5}, {'map': 0.76145533333333348, 'max_delta_step': 4}, {'map': 0.76078199999999996, 'max_delta_step': 3}]
+DEBUG:root:best params so far
+DEBUG:root:{'colsample_bytree': 0.7, 'silent': 1, 'colsample_bylevel': 0.6, 'scale_pos_weight': 1, 'max_delta_step': 5, 'nthread': 4, 'min_child_weight': 3, 'subsample': 0.9, 'eta': 0.1, 'objective': 'multi:softprob', 'max_depth': 7, 'gamma': 0.1}
+DEBUG:root:top map results
+DEBUG:root:[{'subsample': 0.9, 'colsample_bytree': 0.65, 'map': 0.76235399999999987}, {'subsample': 0.9, 'colsample_bytree': 0.7, 'map': 0.76235399999999987}, {'subsample': 0.9, 'colsample_bytree': 0.75, 'map': 0.76190499999999994}]
+DEBUG:root:best params so far
+DEBUG:root:{'colsample_bytree': 0.65, 'silent': 1, 'colsample_bylevel': 0.6, 'scale_pos_weight': 1, 'max_delta_step': 5, 'nthread': 4, 'min_child_weight': 3, 'subsample': 0.9, 'eta': 0.1, 'objective': 'multi:softprob', 'max_depth': 7, 'gamma': 0.1}
+DEBUG:root:~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+DEBUG:root:best params for the grid 200, 20, 30, 10
+DEBUG:root:grid no m, n 12, 67
+DEBUG:root:threshold: 7
+DEBUG:root:{'colsample_bytree': 0.65, 'silent': 1, 'colsample_bylevel': 0.6, 'scale_pos_weight': 1, 'max_delta_step': 5, 'nthread': 4, 'min_child_weight': 3, 'subsample': 0.9, 'eta': 0.1, 'objective': 'multi:softprob', 'max_depth': 7, 'gamma': 0.1}
+DEBUG:root:###################################################
+DEBUG:root:@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+DEBUG:root:no of classes: 34
+DEBUG:root:top map results
+DEBUG:root:[{'map': 0.67726533333333327, 'max_depth': 7, 'min_child_weight': 2}, {'map': 0.67673566666666662, 'max_depth': 8, 'min_child_weight': 2}, {'map': 0.67620599999999997, 'max_depth': 6, 'min_child_weight': 2}]
+DEBUG:root:best params so far
+DEBUG:root:{'colsample_bytree': 0.7, 'silent': 1, 'scale_pos_weight': 1, 'nthread': 4, 'min_child_weight': 2, 'subsample': 0.9, 'eta': 0.1, 'objective': 'multi:softprob', 'max_depth': 7, 'gamma': 0.32}
+DEBUG:root:top map results
+DEBUG:root:[{'map': 0.67567566666666667, 'gamma': 0.5, 'colsample_bylevel': 0.5}, {'map': 0.67514566666666675, 'gamma': 0.4, 'colsample_bylevel': 0.5}, {'map': 0.67461599999999999, 'gamma': 0.3, 'colsample_bylevel': 0.9}]
+DEBUG:root:best params so far
+DEBUG:root:{'colsample_bytree': 0.7, 'silent': 1, 'colsample_bylevel': 0.5, 'scale_pos_weight': 1, 'nthread': 4, 'min_child_weight': 2, 'subsample': 0.9, 'eta': 0.1, 'objective': 'multi:softprob', 'max_depth': 7, 'gamma': 0.5}
+DEBUG:root:top map results
+DEBUG:root:[{'map': 0.67938533333333329, 'max_delta_step': 4}, {'map': 0.67567566666666667, 'max_delta_step': 10}, {'map': 0.67567566666666667, 'max_delta_step': 11}]
+DEBUG:root:best params so far
+DEBUG:root:{'colsample_bytree': 0.7, 'silent': 1, 'colsample_bylevel': 0.5, 'scale_pos_weight': 1, 'max_delta_step': 4, 'nthread': 4, 'min_child_weight': 2, 'subsample': 0.9, 'eta': 0.1, 'objective': 'multi:softprob', 'max_depth': 7, 'gamma': 0.5}
+DEBUG:root:top map results
+DEBUG:root:[{'subsample': 0.9, 'colsample_bytree': 0.65, 'map': 0.67938533333333329}, {'subsample': 0.9, 'colsample_bytree': 0.7, 'map': 0.67938533333333329}, {'subsample': 0.75, 'colsample_bytree': 0.85, 'map': 0.67832533333333334}]
+DEBUG:root:best params so far
+DEBUG:root:{'colsample_bytree': 0.65, 'silent': 1, 'colsample_bylevel': 0.5, 'scale_pos_weight': 1, 'max_delta_step': 4, 'nthread': 4, 'min_child_weight': 2, 'subsample': 0.9, 'eta': 0.1, 'objective': 'multi:softprob', 'max_depth': 7, 'gamma': 0.5}
+DEBUG:root:~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+DEBUG:root:best params for the grid 200, 20, 30, 10
+DEBUG:root:grid no m, n 31, 140
+DEBUG:root:threshold: 7
+DEBUG:root:{'colsample_bytree': 0.65, 'silent': 1, 'colsample_bylevel': 0.5, 'scale_pos_weight': 1, 'max_delta_step': 4, 'nthread': 4, 'min_child_weight': 2, 'subsample': 0.9, 'eta': 0.1, 'objective': 'multi:softprob', 'max_depth': 7, 'gamma': 0.5}
+DEBUG:root:###################################################
