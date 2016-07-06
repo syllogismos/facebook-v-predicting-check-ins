@@ -1,4 +1,4 @@
-# Dialy Log
+# Notes
 
 ## 20th May
 
