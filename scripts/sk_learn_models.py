@@ -55,33 +55,50 @@ class KNN_feature_weights(SklearnModel):
         """
         X = [[x, y, a, t]]
         """
-        fw = [500., 1000., 4., 3., 2., 10., 10.]
+        fw = [0.6, 0.32935, 0.56515, 0.2670, 22, 52, 0.51785]
         minute_v = X[:, 3]%60
         hour_v = X[:, 3]//60
         weekday_v = hour_v//24
         month_v = weekday_v//30
-        year_v = (weekday_v//365 + 1)*fw[5]
+        year_v = (weekday_v//365 + 1)*fw[6]
         hour_v = ((hour_v%24 + 1) + minute_v/60.0)*fw[2]
         weekday_v = (weekday_v%7 + 1)*fw[3]
         month_v = (month_v%12 +1)*fw[4]
-        accuracy_v = np.log10(X[:, 2])*fw[6]
-        x_v = X[:, 0]*fw[0]
-        y_v = X[:, 1]*fw[1]
+        accuracy_v = np.log10(X[:, 2])*fw[0]
+        minute = 2*np.pi*((X[:, 3]//5)%288)/288
+        minute_sin= (np.sin(minute)+1).round(4) * fw[2]
+        minute_cos = (np.cos(minute)+1).round(4) * fw[2]
+        del minute
+        day = 2*np.pi*((X[:, 3]//1440)%365)/365
+        day_sin = (np.sin(day)+1).round(4) * fw[1]
+        day_cos = (np.cos(day)+1).round(4) * fw[1]
+        del day
+        weekday = 2*np.pi*((X[:, 3]//1440)%7)/7
+        weekday_sin = (np.sin(weekday)+1).round(4) * fw[3]
+        weekday_cos = (np.cos(weekday)+1).round(4) * fw[3]
+        del weekday
+
+        x_v = X[:, 0]*fw[4]
+        y_v = X[:, 1]*fw[5]
         new_X = np.hstack((x_v.reshape(-1, 1),\
                          y_v.reshape(-1, 1),\
                          accuracy_v.reshape(-1, 1),\
-                         hour_v.reshape(-1, 1),\
-                         weekday_v.reshape(-1, 1),\
-                         month_v.reshape(-1, 1),\
+                         minute_sin.reshape(-1, 1),\
+                         minute_cos.reshape(-1, 1),\
+                         day_sin.reshape(-1, 1),\
+                         day_cos.reshape(-1, 1),\
+                         weekday_sin.reshape(-1, 1),\
+                         weekday_cos.reshape(-1, 1),\
                          year_v.reshape(-1, 1)))
         return (new_X, x_transformer)
 
 
     def custom_classifier(self, X, Y):
-        clf = KNeighborsClassifier(n_neighbors = 16, weights = 'distance', metric = 'manhattan')
+        clf = KNeighborsClassifier(n_neighbors = 31, weights = calculate_distance, p = 1)
         clf.fit(X, np.ravel(Y))
         return clf
-
+def calculate_distance(distances):
+    return distances ** -2
 
 class top_3_using_knn_model(SklearnModel):
     def __init__(self, cv_file = '../main_cv_0.02_5.csv', \
@@ -173,9 +190,9 @@ class top_3_using_knn_model(SklearnModel):
 if __name__ == '__main__':
     run = 100
     # days one hot encoder, quarter days one hot encoder, xya scaled
-    g = Grid(X = 800, Y = 400, xd = 200, yd = 100, pref = 'grid')
-    knn = KNN(grid = g, threshold = 7, description = 'days_oh_quarter_days_oh_scaled_n_neighbors7_xya')
-    f = open('../cv_run_21_Jun.txt', 'ab')
+    g = Grid(X = 200, Y = 50, xd = 20, yd = 5, pref = 'grid')
+    knn = KNN(grid = g, threshold = 7, description = 'fws_from_mad_script')
+    f = open('../cv_run_6_Jul.txt', 'ab')
     f.write(str(run) + '\n')
     f.write(knn.description)
     print "Traning the classifier"
@@ -183,5 +200,5 @@ if __name__ == '__main__':
     cv = knn.check_cross_validation()
     f.write(str(cv))
     f.write('\n')
-    knn.generate_submission_file('../knn_21_june_oh_encoding_n_neightbors7_100')
+    knn.generate_submission_file('../knn_mamad.csv')
     f.close()
