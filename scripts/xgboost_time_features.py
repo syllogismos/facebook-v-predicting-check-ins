@@ -18,6 +18,9 @@ import pdb
 
 from multiprocessing import Pool
 
+import logging
+logging.basicConfig(filename='xgb_time_feature_runs.log', level=logging.DEBUG)
+
 grid = Grid(X = 400, Y = 100, xd = 50, yd = 10, pref = 'grid1', train_file = '../main_train_0.02_5.csv')
 
 def map3eval(preds, dtrain):
@@ -204,13 +207,13 @@ def trans_x(X, x_transformer = None):
                      day_of_year_cos.reshape(-1, 1),\
                      weekday_sin.reshape(-1, 1),\
                      weekday_cos.reshape(-1, 1),\
-                     hour_v.reshape(-1, 1),\
-                     hour_v_2.reshape(-1, 1),\
-                     hour_v_3.reshape(-1, 1),\
-                     hour_v_4.reshape(-1, 1),\
-                     hour_v_6.reshape(-1, 1),\
-                     hour_v_8.reshape(-1, 1),\
-                     weekday_v.reshape(-1, 1),\
+                     # hour_v.reshape(-1, 1),\
+                     # hour_v_2.reshape(-1, 1),\
+                     # hour_v_3.reshape(-1, 1),\
+                     # hour_v_4.reshape(-1, 1),\
+                     # hour_v_6.reshape(-1, 1),\
+                     # hour_v_8.reshape(-1, 1),\
+                     # weekday_v.reshape(-1, 1),\
                      month_v.reshape(-1, 1),\
                      year_v.reshape(-1, 1)))
     return (X_new, x_transformer)
@@ -381,6 +384,7 @@ class XGB_Model(SklearnModel):
         return np.mean(apk_list)
 
     def train_and_predict_parallel(self, submission_file, upload_to_s3 = False):
+        logging.debug('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
         init_time = time.time()
         cv_data = np.loadtxt(self.cross_validation_file, dtype = float, delimiter = ',')
         test_data = np.loadtxt(self.test_file, dtype = float, delimiter = ',')
@@ -442,6 +446,7 @@ class XGB_Model(SklearnModel):
         del(test_grid_wise_data)
         del(cv_grid_wise_data)
         print "Training time of parallel processing %s" %(time.time() - init_time)
+        logging.debug("Training time of parallel processing %s" %(time.time() - init_time))
         # row_results = map(StateLoader(state), range(1))
         # pdb.set_trace()
         test_rows = map(lambda x: x[0], row_results)
@@ -484,6 +489,9 @@ class XGB_Model(SklearnModel):
         apk_list = map(lambda row: apk(row[-1:], row[1:4]), cv_a_p)
         self.cv_mean_precision = np.mean(apk_list)
         print "mean precision of cross validation set", str(self.cv_mean_precision)
+        logging.debug("mean precision of cross validation set: " + str(self.cv_mean_precision))
+        logging.debug(submission_file)
+        logging.debug("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
 
         sorted_test = sorted_test.astype(str)
         submission = open(submission_file, 'wb')
