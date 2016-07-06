@@ -23,6 +23,20 @@ logging.basicConfig(filename='xgb_time_feature_runs.log', level=logging.DEBUG)
 
 grid = Grid(X = 400, Y = 100, xd = 50, yd = 10, pref = 'grid1', train_file = '../main_train_0.02_5.csv')
 
+default_xgb_params = {
+    'objective': 'multi:softprob',
+    'eta': 0.1,
+    'max_depth': 3,
+    'min_child_weight': 6,
+    'gamma': 0.1,
+    'subsample': 0.9,
+    'colsample_bytree': 0.6,
+    'scale_pos_weight': 1,
+    'nthread': 4,
+    'silent': 1,
+    'max_delta_step': 7
+}
+
 def map3eval(preds, dtrain):
     actual = dtrain.get_label()
     predicted = preds.argsort(axis=1)[:,-np.arange(1,4)]
@@ -51,7 +65,7 @@ state = {
     'folder': for giggles, i mean to save files
 """
 def train_row(i, state):
-    print "processing row %s" %(i)
+    # print "processing row %s" %(i)
     init_row_time = time.time()
     test_preds = []
     cv_preds = []
@@ -261,6 +275,9 @@ class XGB_Model(SklearnModel):
         """
         return trans_x(X, x_transformer)
 
+    def ini_params(self, params = default_xgb_params):
+        self.params = params
+
     def custom_classifier(self, X, Y, params):
         classifier(X, Y, params)
 
@@ -409,24 +426,25 @@ class XGB_Model(SklearnModel):
         state['test_grid'] = test_grid_wise_data
         state['threshold'] = self.threshold
 
-        default_xgb_params = {
-            'objective': 'multi:softprob',
-            'eta': 0.1,
-            'max_depth': 3,
-            'min_child_weight': 6,
-            'gamma': 0.1,
-            'subsample': 0.9,
-            'colsample_bytree': 0.6,
-            'scale_pos_weight': 1,
-            'nthread': 4,
-            'silent': 1,
-            'max_delta_step': 7
-        }
+        # default_xgb_params = {
+        #     'objective': 'multi:softprob',
+        #     'eta': 0.1,
+        #     'max_depth': 3,
+        #     'min_child_weight': 6,
+        #     'gamma': 0.1,
+        #     'subsample': 0.9,
+        #     'colsample_bytree': 0.6,
+        #     'scale_pos_weight': 1,
+        #     'nthread': 4,
+        #     'silent': 1,
+        #     'max_delta_step': 7
+        # }
+        xgb_params = self.params
 
         paramsFile = None # '../correct_row_wise_grid_search_results.pickle'# self.grid.getParamsFile(5, 123340)
         if paramsFile == None:
             print "params file doesn't exist.. so loading default params"
-            state['params_dict'] = [[default_xgb_params for n in range(self.grid.max_n + 1)]\
+            state['params_dict'] = [[xgb_params for n in range(self.grid.max_n + 1)]\
                                         for m in range(self.grid.max_m + 1)]
         else:
             state['params_dict'] = pickle.load(open(paramsFile, 'rb'))
