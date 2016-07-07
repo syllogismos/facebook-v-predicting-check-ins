@@ -42,7 +42,7 @@ n = args.n #40
 th = args.th #3
 
 # g = grid.Grid(200, 50, 20, 5, pref = 'grid')
-g = grid.Grid(args.X, args.Y, args.xd, args.yd, pref = 'grid')
+g = grid.Grid(args.X, args.Y, args.xd, args.yd, pref = 'grid', files_flag = True)
 g.generateCardinalityMatrix()
 
 
